@@ -1,0 +1,2883 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CopyStudio · 社媒文案生成器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0e0f;
+  --bg2: #161618;
+  --bg3: #1e1e21;
+  --bg4: #26262b;
+  --border: #2e2e35;
+  --border2: #3a3a42;
+  --text: #f0ede8;
+  --text2: #a8a59e;
+  --text3: #6b6865;
+  --gold: #c9a84c;
+  --gold2: #e8c96a;
+  --gold3: #f5e0a0;
+  --accent: #c9a84c;
+  --radius: 12px;
+  --radius-lg: 18px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
+  --platform-color: #c9a84c;
+}
+
+/* Platform themes */
+.platform-xhs { --platform-color: #ff2442; --platform-bg: rgba(255,36,66,0.08); }
+.platform-douyin { --platform-color: #69c9d0; --platform-bg: rgba(105,201,208,0.08); }
+.platform-weibo { --platform-color: #e6162d; --platform-bg: rgba(230,22,45,0.08); }
+.platform-wechat { --platform-color: #07c160; --platform-bg: rgba(7,193,96,0.08); }
+.platform-instagram { --platform-color: #e1306c; --platform-bg: rgba(225,48,108,0.08); }
+.platform-twitter { --platform-color: #1d9bf0; --platform-bg: rgba(29,155,240,0.08); }
+.platform-tiktok { --platform-color: #ff0050; --platform-bg: rgba(255,0,80,0.08); }
+.platform-bilibili { --platform-color: #fb7299; --platform-bg: rgba(251,114,153,0.08); }
+.platform-zhihu { --platform-color: #0084ff; --platform-bg: rgba(0,132,255,0.08); }
+.platform-linkedin { --platform-color: #0a66c2; --platform-bg: rgba(10,102,194,0.08); }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', 'Noto Serif SC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* Background grain */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 28px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+
+.logo-text {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  letter-spacing: -0.3px;
+  background: linear-gradient(135deg, var(--gold3), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo-sub {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: -3px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-icon {
+  width: 36px; height: 36px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 16px;
+  transition: all 0.2s;
+}
+.btn-icon:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+
+/* Main layout */
+.main {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  min-height: calc(100vh - 65px);
+  position: relative;
+  z-index: 1;
+}
+
+/* Left panel */
+.left-panel {
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  height: calc(100vh - 65px);
+  position: sticky;
+  top: 65px;
+}
+
+.panel-section {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Platform grid */
+.platform-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.platform-card {
+  aspect-ratio: 1;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--bg3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.platform-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--platform-bg, transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.platform-card:hover::before { opacity: 1; }
+.platform-card.active::before { opacity: 1; }
+.platform-card.active { border-color: var(--platform-color); }
+.platform-card.active .platform-emoji { transform: scale(1.15); }
+
+.platform-emoji { font-size: 20px; transition: transform 0.2s; position: relative; }
+.platform-name {
+  font-size: 10px;
+  color: var(--text2);
+  text-align: center;
+  position: relative;
+  line-height: 1.2;
+}
+.platform-card.active .platform-name { color: var(--platform-color); }
+
+/* Direction tags */
+.direction-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.direction-tag {
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg3);
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.direction-tag:hover { border-color: var(--border2); color: var(--text); }
+.direction-tag.active {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.08);
+  color: var(--gold2);
+}
+
+.dir-icon { font-size: 16px; }
+
+/* Dynamic form */
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-label {
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.form-label .required { color: var(--gold); }
+
+.form-input, .form-textarea, .form-select {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.form-input, .form-select { padding: 10px 12px; height: 40px; }
+.form-textarea { padding: 10px 12px; resize: vertical; min-height: 80px; line-height: 1.5; }
+
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+  border-color: var(--gold);
+}
+
+.form-select {
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b6865' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+
+.form-select option { background: var(--bg3); }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* Star rating */
+.star-rating {
+  display: flex;
+  gap: 4px;
+}
+.star {
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--border2);
+  transition: color 0.15s;
+}
+.star.active { color: var(--gold); }
+.star:hover { color: var(--gold2); }
+
+/* Tags input */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  min-height: 40px;
+  cursor: text;
+}
+
+.tag-chip {
+  background: rgba(201,168,76,0.15);
+  border: 1px solid rgba(201,168,76,0.3);
+  color: var(--gold2);
+  border-radius: 5px;
+  padding: 2px 8px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tag-chip .remove { cursor: pointer; opacity: 0.6; }
+.tag-chip .remove:hover { opacity: 1; }
+
+.tags-input-hidden {
+  border: none;
+  background: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  min-width: 80px;
+  flex: 1;
+}
+
+/* Advanced settings */
+.adv-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+  user-select: none;
+}
+.adv-toggle:hover { background: var(--bg3); }
+
+.adv-toggle-label {
+  font-size: 12px;
+  color: var(--text2);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.adv-arrow {
+  font-size: 12px;
+  color: var(--text3);
+  transition: transform 0.3s;
+}
+.adv-toggle.open .adv-arrow { transform: rotate(180deg); }
+
+.adv-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.adv-content.open { max-height: 800px; }
+
+/* Tone pills */
+.tone-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tone-pill {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg3);
+}
+.tone-pill.active {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.1);
+  color: var(--gold2);
+}
+.tone-pill:hover { border-color: var(--border2); }
+
+/* Length slider */
+.length-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.length-opt {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text2);
+  transition: all 0.2s;
+  background: var(--bg3);
+}
+
+.length-opt.active {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.08);
+  color: var(--gold2);
+}
+
+.length-opt .len-label { font-size: 15px; margin-bottom: 2px; }
+
+/* Count selector */
+.count-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.count-btn {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg3);
+  color: var(--text);
+  font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.count-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+.count-display {
+  width: 32px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gold2);
+}
+
+/* API settings */
+.api-model-select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.model-category {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 0 2px;
+}
+
+/* Generate button */
+.generate-wrap {
+  padding: 20px 24px;
+}
+
+.btn-generate {
+  width: 100%;
+  height: 50px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+  border: none;
+  border-radius: 12px;
+  color: #1a1408;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-generate::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.15);
+  transform: translateX(-100%);
+  transition: transform 0.5s;
+}
+
+.btn-generate:hover::before { transform: translateX(100%); }
+.btn-generate:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
+.btn-generate:active { transform: translateY(0); }
+.btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn-generate .spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(26,20,8,0.3);
+  border-top-color: #1a1408;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+
+.btn-generate.loading .btn-text { display: none; }
+.btn-generate.loading .spinner { display: block; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Right panel */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: calc(100vh - 65px);
+  position: sticky;
+  top: 65px;
+}
+
+/* Preview area */
+.preview-area {
+  flex: 1;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Empty state */
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--text3);
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 56px;
+  opacity: 0.5;
+}
+
+.empty-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  color: var(--text2);
+}
+
+.empty-sub { font-size: 14px; line-height: 1.6; }
+
+/* Placeholder suggestions */
+.quick-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.suggestion-chip {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg2);
+}
+.suggestion-chip:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201,168,76,0.06);
+}
+
+/* Result cards */
+.results-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.result-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color 0.2s;
+  animation: fadeSlideUp 0.4s ease both;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.result-card:hover { border-color: var(--border2); }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg3);
+}
+
+.card-platform-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.platform-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--platform-color);
+  box-shadow: 0 0 8px var(--platform-color);
+}
+
+.card-version {
+  font-size: 11px;
+  color: var(--text3);
+  background: var(--bg4);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 2px 8px;
+}
+
+.card-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.card-btn {
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg4);
+  color: var(--text2);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.card-btn:hover { border-color: var(--border2); color: var(--text); }
+.card-btn.copy-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+.card-btn.fav-btn.active { border-color: #e57373; color: #e57373; background: rgba(229,115,115,0.08); }
+
+/* Copy success animation */
+.card-btn.copied {
+  border-color: #4caf50 !important;
+  color: #4caf50 !important;
+  background: rgba(76,175,80,0.08) !important;
+}
+
+.card-body {
+  padding: 18px;
+}
+
+.copy-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.copy-content {
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  outline: none;
+  border-radius: 6px;
+  transition: background 0.2s;
+  min-height: 60px;
+}
+
+.copy-content:focus {
+  background: var(--bg3);
+  padding: 8px;
+  margin: -8px;
+}
+
+.card-footer {
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+  background: var(--bg3);
+}
+
+.tags-line {
+  font-size: 13px;
+  color: var(--platform-color, var(--gold));
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* History panel */
+.history-panel {
+  border-top: 1px solid var(--border);
+  padding: 20px 28px;
+  background: var(--bg);
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.history-title {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+.history-clear {
+  font-size: 11px;
+  color: var(--text3);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.history-clear:hover { color: #e57373; }
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.history-item {
+  padding: 10px 14px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.history-item:hover { border-color: var(--border2); background: var(--bg3); }
+
+.history-item-text {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-item-meta {
+  font-size: 11px;
+  color: var(--text3);
+  white-space: nowrap;
+}
+
+.history-empty {
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+  color: var(--text3);
+}
+
+/* Settings modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  width: 520px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: scale(0.95) translateY(10px);
+  transition: transform 0.3s;
+  box-shadow: var(--shadow);
+}
+
+.modal-overlay.open .modal { transform: scale(1) translateY(0); }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  color: var(--text);
+}
+
+.modal-close {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg3);
+  color: var(--text2);
+  font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.modal-close:hover { border-color: var(--border2); color: var(--text); }
+
+.modal-body { padding: 24px; }
+
+.modal-section-title {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-section { margin-bottom: 24px; }
+
+/* API provider selector */
+.provider-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.provider-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg3);
+}
+
+.provider-card:hover { border-color: var(--border2); }
+.provider-card.active { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+.provider-icon { font-size: 22px; margin-bottom: 4px; }
+.provider-name { font-size: 11px; color: var(--text2); }
+.provider-card.active .provider-name { color: var(--gold); }
+
+.status-dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--text3);
+  margin-right: 6px;
+}
+.status-dot.connected { background: #4caf50; box-shadow: 0 0 6px #4caf50; }
+.status-dot.error { background: #e57373; box-shadow: 0 0 6px #e57373; }
+
+.save-btn {
+  width: 100%;
+  height: 44px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+  border: none;
+  border-radius: 10px;
+  color: #1a1408;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.save-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,168,76,0.3); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  background: var(--bg4);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 14px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow);
+  z-index: 9999;
+  transform: translateY(60px);
+  opacity: 0;
+  transition: all 0.3s;
+}
+
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-color: rgba(76,175,80,0.4); }
+.toast.error { border-color: rgba(229,115,115,0.4); }
+.toast-icon { font-size: 18px; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .main { grid-template-columns: 1fr; }
+  .left-panel {
+    height: auto;
+    position: relative;
+    top: 0;
+  }
+  .right-panel {
+    height: auto;
+    position: relative;
+    top: 0;
+  }
+  .platform-grid { grid-template-columns: repeat(5, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .header { padding: 12px 16px; }
+  .preview-area { padding: 16px; }
+  .panel-section { padding: 16px; }
+  .platform-grid { grid-template-columns: repeat(5, 1fr); }
+  .direction-grid { grid-template-columns: 1fr 1fr; }
+  .provider-grid { grid-template-columns: repeat(3, 1fr); }
+  .form-row { grid-template-columns: 1fr; }
+  .history-panel { padding: 16px; }
+}
+
+/* Animations for loading skeleton */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--bg3) 25%, var(--bg4) 50%, var(--bg3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+
+/* Character count */
+.char-count {
+  font-size: 11px;
+  color: var(--text3);
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* No API badge */
+.no-api-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: var(--text3);
+  background: var(--bg4);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 2px 7px;
+}
+
+.btn-tip {
+  font-size: 12px;
+  color: var(--text3);
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+/* Inline edit hint */
+.edit-hint {
+  font-size: 11px;
+  color: var(--text3);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Score bar */
+.score-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text2);
+  margin-top: 10px;
+}
+
+.score-track {
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.score-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--gold2));
+  transition: width 0.8s ease;
+}
+
+/* Export dropdown */
+.export-dropdown {
+  position: relative;
+}
+
+.export-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 6px;
+  min-width: 140px;
+  z-index: 100;
+  box-shadow: var(--shadow);
+  display: none;
+}
+
+.export-menu.open { display: block; }
+
+.export-item {
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text2);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s;
+}
+.export-item:hover { background: var(--bg4); color: var(--text); }
+
+/* Emoji picker hint */
+.emoji-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.emoji-btn {
+  cursor: pointer;
+  font-size: 18px;
+  padding: 2px;
+  border-radius: 5px;
+  transition: transform 0.15s;
+}
+.emoji-btn:hover { transform: scale(1.3); }
+
+/* Ref link */
+.ref-link {
+  font-size: 11px;
+  color: var(--text3);
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+.ref-link a { color: var(--gold); text-decoration: none; }
+.ref-link a:hover { text-decoration: underline; }
+
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">✦</div>
+    <div>
+      <div class="logo-text">CopyStudio</div>
+      <div class="logo-sub">Social Copy Generator</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <div class="btn-icon" id="historyToggleBtn" title="历史记录" onclick="toggleHistoryPanel()">🕐</div>
+    <div class="btn-icon" id="settingsBtn" title="AI 设置" onclick="openSettings()">⚙️</div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Left Panel -->
+  <div class="left-panel">
+
+    <!-- Platform selection -->
+    <div class="panel-section">
+      <div class="section-label">选择平台</div>
+      <div class="platform-grid" id="platformGrid">
+        <div class="platform-card platform-xhs active" data-platform="xhs" onclick="selectPlatform(this)">
+          <div class="platform-emoji">📕</div>
+          <div class="platform-name">小红书</div>
+        </div>
+        <div class="platform-card platform-douyin" data-platform="douyin" onclick="selectPlatform(this)">
+          <div class="platform-emoji">🎵</div>
+          <div class="platform-name">抖音</div>
+        </div>
+        <div class="platform-card platform-weibo" data-platform="weibo" onclick="selectPlatform(this)">
+          <div class="platform-emoji">🌐</div>
+          <div class="platform-name">微博</div>
+        </div>
+        <div class="platform-card platform-wechat" data-platform="wechat" onclick="selectPlatform(this)">
+          <div class="platform-emoji">💚</div>
+          <div class="platform-name">朋友圈</div>
+        </div>
+        <div class="platform-card platform-instagram" data-platform="instagram" onclick="selectPlatform(this)">
+          <div class="platform-emoji">📷</div>
+          <div class="platform-name">IG</div>
+        </div>
+        <div class="platform-card platform-twitter" data-platform="twitter" onclick="selectPlatform(this)">
+          <div class="platform-emoji">🐦</div>
+          <div class="platform-name">X</div>
+        </div>
+        <div class="platform-card platform-tiktok" data-platform="tiktok" onclick="selectPlatform(this)">
+          <div class="platform-emoji">🎬</div>
+          <div class="platform-name">TikTok</div>
+        </div>
+        <div class="platform-card platform-bilibili" data-platform="bilibili" onclick="selectPlatform(this)">
+          <div class="platform-emoji">📺</div>
+          <div class="platform-name">B站</div>
+        </div>
+        <div class="platform-card platform-zhihu" data-platform="zhihu" onclick="selectPlatform(this)">
+          <div class="platform-emoji">💡</div>
+          <div class="platform-name">知乎</div>
+        </div>
+        <div class="platform-card platform-linkedin" data-platform="linkedin" onclick="selectPlatform(this)">
+          <div class="platform-emoji">💼</div>
+          <div class="platform-name">领英</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Direction selection -->
+    <div class="panel-section">
+      <div class="section-label">内容方向</div>
+      <div class="direction-grid" id="directionGrid">
+        <div class="direction-tag active" data-dir="travel" onclick="selectDirection(this)">
+          <span class="dir-icon">🏝️</span> 旅行打卡
+        </div>
+        <div class="direction-tag" data-dir="food" onclick="selectDirection(this)">
+          <span class="dir-icon">🍜</span> 美食探店
+        </div>
+        <div class="direction-tag" data-dir="product" onclick="selectDirection(this)">
+          <span class="dir-icon">💄</span> 好物种草
+        </div>
+        <div class="direction-tag" data-dir="guide" onclick="selectDirection(this)">
+          <span class="dir-icon">📋</span> 实用攻略
+        </div>
+        <div class="direction-tag" data-dir="mood" onclick="selectDirection(this)">
+          <span class="dir-icon">💭</span> 心情日记
+        </div>
+        <div class="direction-tag" data-dir="study" onclick="selectDirection(this)">
+          <span class="dir-icon">📚</span> 学习成长
+        </div>
+        <div class="direction-tag" data-dir="fitness" onclick="selectDirection(this)">
+          <span class="dir-icon">💪</span> 健身运动
+        </div>
+        <div class="direction-tag" data-dir="photo" onclick="selectDirection(this)">
+          <span class="dir-icon">📸</span> 摄影分享
+        </div>
+        <div class="direction-tag" data-dir="home" onclick="selectDirection(this)">
+          <span class="dir-icon">🏠</span> 家居生活
+        </div>
+        <div class="direction-tag" data-dir="review" onclick="selectDirection(this)">
+          <span class="dir-icon">🎬</span> 影视书评
+        </div>
+        <div class="direction-tag" data-dir="career" onclick="selectDirection(this)">
+          <span class="dir-icon">💼</span> 职场心得
+        </div>
+        <div class="direction-tag" data-dir="pet" onclick="selectDirection(this)">
+          <span class="dir-icon">🐾</span> 萌宠日常
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic form -->
+    <div class="panel-section" id="dynamicFormSection">
+      <div class="section-label">填写信息</div>
+      <div id="dynamicForm"></div>
+    </div>
+
+    <!-- Advanced toggle -->
+    <div class="adv-toggle" id="advToggle" onclick="toggleAdv()">
+      <div class="adv-toggle-label">⚙ 高级设置</div>
+      <div class="adv-arrow">▼</div>
+    </div>
+
+    <div class="adv-content" id="advContent">
+      <div class="panel-section">
+
+        <!-- Tone -->
+        <div class="form-group">
+          <div class="form-label">文案语气</div>
+          <div class="tone-pills">
+            <div class="tone-pill active" data-tone="种草">🌱 种草</div>
+            <div class="tone-pill" data-tone="亲切">🤗 亲切</div>
+            <div class="tone-pill" data-tone="专业">🎓 专业</div>
+            <div class="tone-pill" data-tone="幽默">😄 幽默</div>
+            <div class="tone-pill" data-tone="治愈">🌸 治愈</div>
+            <div class="tone-pill" data-tone="励志">🔥 励志</div>
+            <div class="tone-pill" data-tone="简洁">✨ 简洁</div>
+            <div class="tone-pill" data-tone="高级感">💎 高级感</div>
+          </div>
+        </div>
+
+        <!-- Length -->
+        <div class="form-group">
+          <div class="form-label">文案长度</div>
+          <div class="length-options">
+            <div class="length-opt" data-len="short">
+              <div class="len-label">🐣</div>简短
+            </div>
+            <div class="length-opt active" data-len="medium">
+              <div class="len-label">🌿</div>适中
+            </div>
+            <div class="length-opt" data-len="long">
+              <div class="len-label">🌳</div>详细
+            </div>
+          </div>
+        </div>
+
+        <!-- Count -->
+        <div class="form-group">
+          <div class="form-label">生成数量</div>
+          <div class="count-selector">
+            <div class="count-btn" onclick="changeCount(-1)">−</div>
+            <div class="count-display" id="countDisplay">3</div>
+            <div class="count-btn" onclick="changeCount(1)">+</div>
+            <span style="font-size:12px;color:var(--text3);margin-left:6px;">条文案</span>
+          </div>
+        </div>
+
+        <!-- Extra instructions -->
+        <div class="form-group">
+          <div class="form-label">补充要求 <span style="color:var(--text3)">(选填)</span></div>
+          <textarea class="form-textarea" id="extraInstructions" placeholder="如：加入更多emoji、模仿某种风格、不要太多hashtag..." style="min-height:60px;"></textarea>
+        </div>
+
+        <!-- Language -->
+        <div class="form-group">
+          <div class="form-label">文案语言</div>
+          <select class="form-select" id="langSelect">
+            <option value="zh">🇨🇳 中文</option>
+            <option value="en">🇺🇸 English</option>
+            <option value="mixed">🌏 中英混合</option>
+          </select>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Generate -->
+    <div class="generate-wrap">
+      <button class="btn-generate" id="generateBtn" onclick="generate()">
+        <div class="spinner"></div>
+        <span class="btn-text">✦ 生成文案</span>
+      </button>
+      <div class="btn-tip" id="apiStatusTip">🤖 使用内置模板引擎 · <span style="color:var(--gold);cursor:pointer;" onclick="openSettings()">接入AI获得更好效果</span></div>
+    </div>
+
+  </div>
+
+  <!-- Right Panel -->
+  <div class="right-panel">
+    <div class="preview-area" id="previewArea">
+      <!-- Empty state -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">✦</div>
+        <div class="empty-title">开始创作你的文案</div>
+        <div class="empty-sub">选择平台和内容方向<br>填写关键信息，点击生成</div>
+        <div class="quick-suggestions">
+          <div class="suggestion-chip" onclick="quickFill('travel')">🏝️ 旅游打卡示例</div>
+          <div class="suggestion-chip" onclick="quickFill('food')">🍜 美食探店示例</div>
+          <div class="suggestion-chip" onclick="quickFill('product')">💄 好物种草示例</div>
+          <div class="suggestion-chip" onclick="quickFill('fitness')">💪 健身打卡示例</div>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="results-container" id="resultsContainer" style="display:none;"></div>
+    </div>
+
+    <!-- History panel -->
+    <div class="history-panel" id="historyPanel" style="display:none;">
+      <div class="history-header">
+        <div class="history-title">⏱ 历史记录</div>
+        <div class="history-clear" onclick="clearHistory()">清空</div>
+      </div>
+      <div class="history-list" id="historyList">
+        <div class="history-empty">暂无历史记录</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal" onclick="closeSettingsOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">AI 设置</div>
+      <div class="modal-close" onclick="closeSettings()">✕</div>
+    </div>
+    <div class="modal-body">
+
+      <div class="modal-section">
+        <div class="modal-section-title">选择 AI 服务商</div>
+        <div class="provider-grid">
+          <div class="provider-card active" data-provider="openai" onclick="selectProvider(this)">
+            <div class="provider-icon">🤖</div>
+            <div class="provider-name">OpenAI</div>
+          </div>
+          <div class="provider-card" data-provider="claude" onclick="selectProvider(this)">
+            <div class="provider-icon">🧠</div>
+            <div class="provider-name">Claude</div>
+          </div>
+          <div class="provider-card" data-provider="deepseek" onclick="selectProvider(this)">
+            <div class="provider-icon">🐋</div>
+            <div class="provider-name">DeepSeek</div>
+          </div>
+          <div class="provider-card" data-provider="qwen" onclick="selectProvider(this)">
+            <div class="provider-icon">🌟</div>
+            <div class="provider-name">通义千问</div>
+          </div>
+          <div class="provider-card" data-provider="moonshot" onclick="selectProvider(this)">
+            <div class="provider-icon">🌙</div>
+            <div class="provider-name">Moonshot</div>
+          </div>
+          <div class="provider-card" data-provider="custom" onclick="selectProvider(this)">
+            <div class="provider-icon">🔧</div>
+            <div class="provider-name">自定义</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">模型配置</div>
+
+        <div class="form-group">
+          <div class="form-label">API Base URL</div>
+          <input class="form-input" id="apiBaseUrl" placeholder="https://api.openai.com/v1">
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">API Key <span class="required">*</span></div>
+          <input class="form-input" id="apiKey" type="password" placeholder="sk-...">
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">模型名称</div>
+          <select class="form-select" id="modelSelect" onchange="onModelSelectChange()">
+            <optgroup label="OpenAI">
+              <option value="gpt-4o">GPT-4o</option>
+              <option value="gpt-4o-mini">GPT-4o Mini</option>
+              <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+            </optgroup>
+            <optgroup label="Claude">
+              <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+              <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
+            </optgroup>
+            <optgroup label="DeepSeek">
+              <option value="deepseek-chat">DeepSeek Chat</option>
+              <option value="deepseek-reasoner">DeepSeek Reasoner</option>
+            </optgroup>
+            <optgroup label="通义千问">
+              <option value="qwen-turbo">Qwen Turbo</option>
+              <option value="qwen-plus">Qwen Plus</option>
+              <option value="qwen-max">Qwen Max</option>
+            </optgroup>
+            <optgroup label="Moonshot">
+              <option value="moonshot-v1-8k">Moonshot v1 8k</option>
+              <option value="moonshot-v1-32k">Moonshot v1 32k</option>
+            </optgroup>
+            <option value="custom">自定义模型...</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="customModelGroup" style="display:none;">
+          <div class="form-label">自定义模型 ID</div>
+          <input class="form-input" id="customModelInput" placeholder="输入模型名称">
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+          <span class="status-dot" id="apiStatusDot"></span>
+          <span style="font-size:12px;color:var(--text3);" id="apiStatusText">未配置</span>
+          <span style="flex:1"></span>
+          <button onclick="testApiConnection()" style="padding:6px 14px;font-size:12px;border:1px solid var(--border);border-radius:7px;background:var(--bg3);color:var(--text2);cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">测试连接</button>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">生成参数</div>
+        <div class="form-row">
+          <div class="form-group">
+            <div class="form-label">Temperature</div>
+            <input class="form-input" id="temperature" type="number" min="0" max="2" step="0.1" value="0.8" placeholder="0.8">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Max Tokens</div>
+            <input class="form-input" id="maxTokens" type="number" min="200" max="4000" step="100" value="1000" placeholder="1000">
+          </div>
+        </div>
+      </div>
+
+      <button class="save-btn" onclick="saveSettings()">✓ 保存设置</button>
+
+      <div class="ref-link" style="margin-top:16px;">
+        ⚠️ API Key 仅存储于本地浏览器，不会上传服务器。
+        <a href="https://platform.openai.com/api-keys" target="_blank">获取 OpenAI Key</a> ·
+        <a href="https://platform.deepseek.com" target="_blank">获取 DeepSeek Key</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">✓</span>
+  <span id="toastMsg">复制成功</span>
+</div>
+
+<script>
+// ===================== STATE =====================
+const state = {
+  platform: 'xhs',
+  direction: 'travel',
+  tone: '种草',
+  length: 'medium',
+  count: 3,
+  tags: [],
+  history: JSON.parse(localStorage.getItem('cs_history') || '[]'),
+  favorites: JSON.parse(localStorage.getItem('cs_favorites') || '[]'),
+  settings: JSON.parse(localStorage.getItem('cs_settings') || '{}'),
+};
+
+// ===================== PLATFORM CONFIG =====================
+const platforms = {
+  xhs:       { name: '小红书', emoji: '📕', color: '#ff2442' },
+  douyin:    { name: '抖音',   emoji: '🎵', color: '#69c9d0' },
+  weibo:     { name: '微博',   emoji: '🌐', color: '#e6162d' },
+  wechat:    { name: '朋友圈', emoji: '💚', color: '#07c160' },
+  instagram: { name: 'Instagram', emoji: '📷', color: '#e1306c' },
+  twitter:   { name: 'X (Twitter)', emoji: '🐦', color: '#1d9bf0' },
+  tiktok:    { name: 'TikTok', emoji: '🎬', color: '#ff0050' },
+  bilibili:  { name: 'B站',   emoji: '📺', color: '#fb7299' },
+  zhihu:     { name: '知乎',   emoji: '💡', color: '#0084ff' },
+  linkedin:  { name: '领英',   emoji: '💼', color: '#0a66c2' },
+};
+
+// ===================== FORM SCHEMAS =====================
+const formSchemas = {
+  travel: [
+    { id: 'destination', label: '目的地', placeholder: '如：京都、北海道、云南大理', required: true },
+    { id: 'spots', label: '去了哪些地方/景点', placeholder: '如：岚山竹林、伏见稻荷、哲学之道', required: true },
+    { id: 'highlight', label: '最难忘的瞬间', placeholder: '如：清晨薄雾中的竹林、路边随手买的温豆腐...', type: 'textarea' },
+    { id: 'companions', label: '同行人', placeholder: '如：和男友、独自一人、和闺蜜', required: false },
+    { id: 'mood', label: '整体心情', placeholder: '如：超治愈、震撼、惊喜', required: false },
+    { id: 'budget', label: '人均花费（选填）', placeholder: '如：2000元/天', required: false },
+    { id: 'tips', label: '实用小贴士（选填）', placeholder: '如：避开人流高峰、一定要买某某小吃...', type: 'textarea', required: false },
+  ],
+  food: [
+    { id: 'restaurant', label: '餐厅/店名', placeholder: '如：和牛职人、陈麻婆豆腐', required: true },
+    { id: 'location', label: '位置', placeholder: '如：北京三里屯、上海静安寺附近', required: true },
+    { id: 'dishes', label: '点了哪些菜', placeholder: '如：招牌牛肉面、酸菜鱼、招牌甜品', required: true },
+    { id: 'taste', label: '口味感受', placeholder: '如：鲜美浓郁、辣而不腻、层次丰富', required: false },
+    { id: 'price', label: '人均消费', placeholder: '如：88元', required: false },
+    { id: 'atmosphere', label: '氛围环境', placeholder: '如：装修有格调、露天庭院、适合拍照', required: false },
+    { id: 'rating', label: '推荐指数', type: 'stars', required: false },
+  ],
+  product: [
+    { id: 'product', label: '产品名称', placeholder: '如：SK-II神仙水、戴森卷发棒', required: true },
+    { id: 'brand', label: '品牌', placeholder: '如：SK-II、Dyson', required: false },
+    { id: 'price', label: '价格', placeholder: '如：399元、¥1890', required: false },
+    { id: 'where', label: '购买渠道', placeholder: '如：官方旗舰店、小红书、海外代购', required: false },
+    { id: 'feeling', label: '使用感受', placeholder: '如：上脸超水润、持久不脱妆、头发丝滑', required: true, type: 'textarea' },
+    { id: 'pros', label: '优点', placeholder: '如：效果显著、颜值高、性价比高', required: false },
+    { id: 'who', label: '适合人群', placeholder: '如：干皮星人、懒人党、精致女孩', required: false },
+  ],
+  guide: [
+    { id: 'topic', label: '攻略主题', placeholder: '如：日本京都3天2夜、大理古城逃离攻略', required: true },
+    { id: 'audience', label: '适合人群', placeholder: '如：情侣、独旅、亲子游', required: false },
+    { id: 'tips', label: '核心干货/Tips', placeholder: '每行一条，如：\n1. 订酒店要趁早\n2. 避开周末高峰\n3. 这家餐厅必吃', required: true, type: 'textarea' },
+    { id: 'budget', label: '预算参考', placeholder: '如：总费用约3000元', required: false },
+    { id: 'notes', label: '注意事项', placeholder: '如：记得带防晒、提前查好交通路线', required: false, type: 'textarea' },
+  ],
+  mood: [
+    { id: 'topic', label: '今天的主题', placeholder: '如：雨天的下午、意外的小确幸', required: true },
+    { id: 'mood', label: '心情状态', placeholder: '如：平静、感动、有点小感慨', required: true },
+    { id: 'event', label: '发生了什么', placeholder: '如：第一次一个人去看了场电影...', type: 'textarea', required: false },
+    { id: 'feeling', label: '感悟/想说的话', placeholder: '如：原来一个人也可以很自在', type: 'textarea', required: false },
+  ],
+  study: [
+    { id: 'subject', label: '学习内容', placeholder: '如：Python编程、考研英语、日语N2', required: true },
+    { id: 'days', label: '打卡天数', placeholder: '如：Day 30', required: false },
+    { id: 'progress', label: '今日进度', placeholder: '如：完成了第三章的笔记整理', required: false },
+    { id: 'gain', label: '今日收获', placeholder: '如：终于搞懂了函数的概念', required: false, type: 'textarea' },
+    { id: 'encourage', label: '鼓励自己的话', placeholder: '如：坚持就是胜利，加油！', required: false },
+  ],
+  fitness: [
+    { id: 'type', label: '运动类型', placeholder: '如：跑步、瑜伽、力量训练、游泳', required: true },
+    { id: 'duration', label: '运动时长', placeholder: '如：45分钟', required: false },
+    { id: 'calories', label: '消耗卡路里（选填）', placeholder: '如：350kcal', required: false },
+    { id: 'feeling', label: '运动感受', placeholder: '如：累但很爽、突破了自己、今天状态很好', required: false, type: 'textarea' },
+    { id: 'change', label: '身体变化/成果', placeholder: '如：减了2斤、体脂降了1%、跑步配速进步了', required: false },
+    { id: 'days', label: '坚持天数', placeholder: '如：Day 15', required: false },
+  ],
+  photo: [
+    { id: 'location', label: '拍摄地点', placeholder: '如：苏州园林、东京新宿街头', required: true },
+    { id: 'device', label: '使用设备', placeholder: '如：Sony A7C、iPhone 15 Pro、富士X100', required: false },
+    { id: 'technique', label: '拍摄技巧', placeholder: '如：黄金时刻逆光、长曝光、人文纪实', required: false },
+    { id: 'editing', label: '后期处理', placeholder: '如：Lightroom、VSCO滤镜、原片直出', required: false },
+    { id: 'story', label: '照片背后的故事', placeholder: '如：等了一个小时终于等到光线...' , required: false, type: 'textarea' },
+  ],
+  home: [
+    { id: 'item', label: '家居好物/改造内容', placeholder: '如：沙发、灯具改造、书房整理', required: true },
+    { id: 'style', label: '家居风格', placeholder: '如：北欧极简、日式侘寂、奶油风', required: false },
+    { id: 'brand', label: '品牌/来源', placeholder: '如：宜家、淘宝自选、闲鱼淘来的', required: false },
+    { id: 'effect', label: '改造前后对比', placeholder: '如：从杂乱无章到清爽整洁', required: false },
+    { id: 'feeling', label: '入住/使用感受', placeholder: '如：终于有了自己的一方天地，超治愈', type: 'textarea', required: false },
+  ],
+  review: [
+    { id: 'title', label: '作品名称', placeholder: '如：《流浪地球2》、《解忧杂货店》', required: true },
+    { id: 'type', label: '类型', placeholder: '如：科幻电影、小说、纪录片', required: false },
+    { id: 'rating', label: '评分', type: 'stars', required: false },
+    { id: 'summary', label: '一句话感受', placeholder: '如：看完久久不能平静', required: false },
+    { id: 'detail', label: '详细评价', placeholder: '最打动你的情节、台词、或整体感受', type: 'textarea', required: false },
+    { id: 'recommend', label: '推荐理由', placeholder: '如：适合和伴侣一起看、需要静下心来慢慢品味', required: false },
+  ],
+  career: [
+    { id: 'topic', label: '职场主题', placeholder: '如：第一次独立带项目、面试经验分享', required: true },
+    { id: 'industry', label: '行业/岗位（选填）', placeholder: '如：互联网运营、金融分析师', required: false },
+    { id: 'story', label: '具体经历', placeholder: '如：今天开了个超高效的会议...', type: 'textarea', required: false },
+    { id: 'insight', label: '感悟/干货', placeholder: '如：沟通时最重要的是换位思考...', type: 'textarea', required: false },
+  ],
+  pet: [
+    { id: 'petname', label: '宠物名字', placeholder: '如：橘子、豆豆', required: true },
+    { id: 'pettype', label: '宠物种类', placeholder: '如：金毛、英短、仓鼠', required: false },
+    { id: 'event', label: '今日趣事', placeholder: '如：第一次学会了握手、偷吃了我的零食', type: 'textarea', required: true },
+    { id: 'feeling', label: '铲屎官心情', placeholder: '如：被治愈了、超想亲它', required: false },
+  ],
+};
+
+// ===================== PLATFORM STYLE CONFIG =====================
+const platformStyles = {
+  xhs: {
+    charLimit: 1000,
+    hashtagStyle: '#topic',
+    features: ['emoji丰富', '标题党', '姐妹语气', '分段清晰', '种草感'],
+    titleEmoji: true,
+    hashtagCount: '5-10',
+  },
+  douyin: {
+    charLimit: 500,
+    hashtagStyle: '#topic',
+    features: ['简短有力', '口语化', '话题标签', '节奏感强'],
+    titleEmoji: false,
+    hashtagCount: '3-5',
+  },
+  weibo: {
+    charLimit: 2000,
+    hashtagStyle: '#topic#',
+    features: ['话题性强', '互动引导', '超话标签', '可配图说明'],
+    titleEmoji: false,
+    hashtagCount: '2-4',
+  },
+  wechat: {
+    charLimit: 800,
+    hashtagStyle: '',
+    features: ['生活化', '真实感', '不过分营销', '朋友圈风格'],
+    titleEmoji: false,
+    hashtagCount: '0',
+  },
+  instagram: {
+    charLimit: 2200,
+    hashtagStyle: '#tag',
+    features: ['视觉描述强', '英文为主', '简洁优雅'],
+    titleEmoji: true,
+    hashtagCount: '10-15',
+  },
+  twitter: {
+    charLimit: 280,
+    hashtagStyle: '#tag',
+    features: ['极度精简', '140字内核心', 'hashtag点睛'],
+    titleEmoji: false,
+    hashtagCount: '1-3',
+  },
+  tiktok: {
+    charLimit: 500,
+    hashtagStyle: '#topic',
+    features: ['钩子开头', '口播风格', '挑战话题', 'FYP'],
+    titleEmoji: false,
+    hashtagCount: '3-5',
+  },
+  bilibili: {
+    charLimit: 1500,
+    hashtagStyle: '#topic',
+    features: ['二次元文化', '专业干货', '弹幕互动', '番剧感'],
+    titleEmoji: true,
+    hashtagCount: '3-6',
+  },
+  zhihu: {
+    charLimit: 5000,
+    hashtagStyle: '',
+    features: ['专业深度', '逻辑清晰', '有理有据', '分析视角'],
+    titleEmoji: false,
+    hashtagCount: '0',
+  },
+  linkedin: {
+    charLimit: 3000,
+    hashtagStyle: '#tag',
+    features: ['职业化', '英文为主', '成就导向', '行业洞察'],
+    titleEmoji: false,
+    hashtagCount: '3-5',
+  },
+};
+
+// ===================== TEMPLATE ENGINE =====================
+const templates = {
+  travel: {
+    xhs: [
+      `{emoji_title}✈️ {destination}｜{highlight_short}被这里治愈了
+
+{companion_intro}来{destination}已经是第{n}次了，但每次都有新的惊喜🌿
+
+📍 必去打卡：
+{spots_list}
+
+✨ 最难忘的瞬间：
+{highlight}
+
+💰 费用参考：{budget}
+🕐 建议游玩时间：{time_tip}
+
+{mood_ending}
+
+{tips_block}
+
+{tags}`,
+      `{destination}这趟说走就走的旅行，值得！🌸
+
+老实说出发前都没攻略，就拎着一个包来了{destination}
+{companion_line}
+
+一共去了：
+{spots_list}
+
+最让我心动的是——{highlight}
+{mood}到甚至觉得不想回去了💭
+
+{budget_line}
+
+{tips_block}
+
+姐妹们有去过{destination}的吗？交流一下👇
+
+{tags}`,
+    ],
+    douyin: [
+      `去了{destination}才知道什么叫真正的治愈💚
+
+{spots_brief}
+
+最惊艳的一幕：{highlight_short}
+
+{companion_short}花了大概{budget}，超值！
+
+{mood}！快来{destination}！
+
+{tags}`,
+    ],
+    weibo: [
+      `刚从{destination}回来，整个人都治愈了✨
+
+{companion_line}一共玩了{spots_brief}，最爱的是{highlight_short}，{mood}。
+
+推荐指数⭐️⭐️⭐️⭐️⭐️，花费大概{budget}，有想去的朋友欢迎私信，可以给你们分享路线！
+
+{tips_block}
+
+{tags_weibo}`,
+    ],
+    wechat: [
+      `刚结束{destination}的旅行，整个人状态好到炸✨
+
+{companion_line}
+
+印象最深的是{highlight_short}，{mood}，拍了好多照片。
+
+{budget_line}，下次还想去！`,
+    ],
+    instagram: [
+      `Lost in {destination} ✨
+
+{highlight}
+
+{companion_en}
+
+Loving every moment here 🌿
+
+{tags_en}`,
+    ],
+    twitter: [
+      `刚从{destination}回来，被{highlight_short}震撼到了😭 下次还去！{tags_short}`,
+    ],
+    default: [
+      `{emoji_title}{destination}旅行记录
+
+{companion_intro}{spots_list}
+
+最难忘：{highlight}
+
+{mood}！{budget_line}
+
+{tags}`,
+    ],
+  },
+  food: {
+    xhs: [
+      `在{location}发现了一家宝藏餐厅！！{rating_emoji}
+
+📍 {restaurant}
+📌 地址：{location}
+
+🍽️ 点了这些：
+{dishes_list}
+
+口味：{taste}
+
+✨ 最惊艳的是：点了{dish_hero}，{taste_detail}，这辈子都忘不掉！
+
+🏠 环境：{atmosphere}
+
+💰 人均：{price}
+
+强烈推荐{who}来这里！去{location}的姐妹收好这篇！
+
+{tags}`,
+      `{restaurant}｜这就是我愿意排队的原因😭
+
+{location}藏着宝藏美食！
+
+必点：{dishes}
+口味：{taste}
+环境：{atmosphere}
+人均：{price}
+
+{taste_detail}
+
+{rating_emoji} 推荐指数爆表，建议大家去了一定要点{dish_hero}！
+
+{tags}`,
+    ],
+    default: [
+      `📍{restaurant}探店报告
+
+地点：{location}
+推荐菜：{dishes}
+口味：{taste}
+人均：{price}
+环境：{atmosphere}
+评价：{rating_emoji}
+
+{taste_detail}
+
+{tags}`,
+    ],
+  },
+  product: {
+    xhs: [
+      `种草警告⚠️ {product}这真的绝了！！
+
+{brand}出的{product}，之前一直听姐妹们推荐，这次终于入手了！
+
+💰 价格：{price}
+🛒 购买：{where}
+
+🌿 使用感受：
+{feeling}
+
+✅ 优点：
+{pros_list}
+
+👥 适合人群：{who}
+
+用了{period}了，真的回购N次！强烈推荐给所有{who}，真的不踩雷！
+
+{tags}`,
+      `救命！{product}真的救了我！😭
+
+我是{who}星人，用过无数产品踩过无数雷
+直到遇到{brand}的{product}——
+
+{feeling}
+
+这件事情让我彻底相信{product_belief}
+
+价格：{price} | 购买渠道：{where}
+
+适合：{who}
+不适合：{not_who}
+
+{tags}`,
+    ],
+    default: [
+      `好物推荐：{product}
+
+品牌：{brand}
+价格：{price}
+购买：{where}
+
+使用感受：
+{feeling}
+
+优点：{pros_list}
+适合人群：{who}
+
+{tags}`,
+    ],
+  },
+  guide: [
+    `{topic}超实用攻略来了！收藏备用❤️‍🔥
+
+适合人群：{audience}
+预算参考：{budget}
+
+【核心干货】
+{tips}
+
+【注意事项⚠️】
+{notes}
+
+这篇攻略是我亲测有效的，建议收藏！有问题欢迎评论区问我～
+
+{tags}`,
+  ],
+  mood: {
+    xhs: [
+      `{topic} | 今天想聊聊{mood}这件事
+
+{event}
+
+{feeling}
+
+也许这就是{insight}
+
+{tags}`,
+    ],
+    wechat: [
+      `{topic}
+
+{event}
+
+{feeling}`,
+    ],
+    default: [
+      `{topic}
+
+心情：{mood}
+
+{event}
+
+{feeling}
+
+{tags}`,
+    ],
+  },
+  study: [
+    `{subject} | 打卡{days} 📚
+
+今日进度：{progress}
+
+今日收获：
+{gain}
+
+{encourage}
+
+坚持就是答案，一起加油💪
+
+{tags}`,
+  ],
+  fitness: [
+    `💪 {type}打卡 {days}
+
+⏱ 时长：{duration}
+🔥 消耗：{calories}
+
+{feeling}
+
+📊 成果：{change}
+
+{encourage}
+
+{tags}`,
+  ],
+  photo: [
+    `📷 {location}摄影记录
+
+设备：{device}
+技巧：{technique}
+后期：{editing}
+
+{story}
+
+摄影是用光记录瞬间，每一张照片都是独一无二的故事。
+
+{tags}`,
+  ],
+  home: [
+    `🏠 家居改造｜{item}
+
+风格：{style}
+来源：{brand}
+
+改造前后：{effect}
+
+{feeling}
+
+属于自己的小天地，超治愈✨
+
+{tags}`,
+  ],
+  review: [
+    `{title} | {summary} {rating_emoji}
+
+类型：{type}
+
+{detail}
+
+推荐理由：{recommend}
+
+强推给所有还没看的人！
+
+{tags}`,
+  ],
+  career: [
+    `关于{topic}，我想分享一些真实经历
+
+{story}
+
+我的感悟：
+{insight}
+
+职场是一场修行，慢慢来～
+
+{tags}`,
+  ],
+  pet: [
+    `{petname}今天又整了个大活😂
+
+{event}
+
+{pettype}真的是世界上最可爱的生物
+{feeling}，根本绷不住！
+
+{tags}`,
+  ],
+};
+
+// ===================== TAG DATABASE =====================
+const tagDb = {
+  travel: ['旅行', '旅游攻略', '探索世界', '出发', '旅行日记', '打卡', '背包旅行', '旅游', '说走就走的旅行', '户外探险'],
+  food: ['美食探店', '觅食', '餐厅推荐', '吃货日记', '探店', '美食打卡', '好吃到哭', '美食推荐', '种草美食', '宝藏餐厅'],
+  product: ['好物推荐', '种草', '好用的东西', '必买清单', '测评', '好物分享', '回购推荐', '买它买它', '质量好物'],
+  guide: ['干货', '攻略', '收藏备用', '实用技巧', '一文搞定', '超全攻略', '必看', '保姆级教程'],
+  mood: ['心情日记', '随手记', '感悟', '生活随想', '治愈', '日常', '碎碎念', '内心独白'],
+  study: ['学习打卡', '自律', '坚持', '每日学习', '备考', '学习日记', '一起努力', '打卡挑战'],
+  fitness: ['健身打卡', '运动日记', '变美计划', '瘦身', '健康生活', '自律打卡', '运动', '保持健康'],
+  photo: ['摄影', '拍照记录', '摄影日记', '光影', '构图', '摄影技巧', '胶片感', '人文摄影'],
+  home: ['家居改造', '北欧风', '家居好物', '居家生活', '家装', '整理收纳', '治愈系', '家的样子'],
+  review: ['观影日记', '读书笔记', '影评', '书评', '推荐', '好看的电影', '读书', '观后感'],
+  career: ['职场干货', '职场成长', '工作感悟', '职场人', '打工日记', '成长记录', '职场新人', '工作经验'],
+  pet: ['云吸猫', '云吸狗', '毛孩子', '宠物日常', '养宠物', '萌宠', '猫奴', '狗奴', '治愈系宠物'],
+};
+
+// ===================== EMOJI DATABASE =====================
+const emojiSets = {
+  travel: ['✈️','🌸','🗺️','🏝️','🌅','🌺','🗼','🏔️','🌊','🎋','🌿','🍃','🌙','⛩️','🎑'],
+  food: ['🍜','🍣','🍰','😋','🍽️','🥢','🍱','🫕','🥗','🌮','🧆','🍲','😭','💯','🔥'],
+  product: ['💄','✨','💅','🌟','💝','🛍️','🎀','💎','🌹','🌸','💫','⭐','🪄','💖'],
+  guide: ['📋','📌','💡','✅','🗒️','🔑','💯','🎯','📍','⚡','🔥','💪','🌟'],
+  mood: ['💭','🌙','☁️','🍃','🌸','💫','🌊','✨','🕯️','🌷','🎐','🍵'],
+  study: ['📚','✏️','📖','💡','🎯','⏰','📝','🌟','💪','🔥','🧠','🎓'],
+  fitness: ['💪','🏃','🔥','⚡','🌊','🧘','🏋️','🎯','💦','🌟','✨','🏅'],
+  photo: ['📷','📸','🌅','✨','🎞️','🌟','💫','🌸','🌊','🏙️','🌃'],
+  home: ['🏠','🌿','🕯️','✨','🛋️','🌸','☕','🌙','💫','🍃'],
+  review: ['🎬','📚','🌟','💫','🎭','🎪','📽️','🎞️','✨','💝'],
+  career: ['💼','🚀','💡','🌟','📈','🎯','✅','💪','🔑'],
+  pet: ['🐾','🐱','🐶','🐰','💕','😍','🥰','💗','✨','🌸'],
+};
+
+// ===================== DYNAMIC FORM =====================
+function renderForm(dir) {
+  const schema = formSchemas[dir] || formSchemas.travel;
+  const container = document.getElementById('dynamicForm');
+  container.innerHTML = '';
+
+  schema.forEach(field => {
+    const group = document.createElement('div');
+    group.className = 'form-group';
+
+    const label = document.createElement('div');
+    label.className = 'form-label';
+    label.innerHTML = field.label + (field.required ? ' <span class="required">*</span>' : '');
+    group.appendChild(label);
+
+    if (field.type === 'textarea') {
+      const ta = document.createElement('textarea');
+      ta.className = 'form-textarea';
+      ta.id = 'field_' + field.id;
+      ta.placeholder = field.placeholder;
+      ta.style.minHeight = '70px';
+      group.appendChild(ta);
+
+      const cc = document.createElement('div');
+      cc.className = 'char-count';
+      cc.id = 'cc_' + field.id;
+      cc.textContent = '0 字';
+      ta.addEventListener('input', () => {
+        cc.textContent = ta.value.length + ' 字';
+      });
+      group.appendChild(cc);
+
+    } else if (field.type === 'stars') {
+      const sr = document.createElement('div');
+      sr.className = 'star-rating';
+      sr.id = 'field_' + field.id;
+      sr.dataset.value = 5;
+      for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('span');
+        star.className = 'star active';
+        star.textContent = '★';
+        star.dataset.val = i;
+        star.addEventListener('click', function() {
+          sr.dataset.value = i;
+          sr.querySelectorAll('.star').forEach((s,idx) => {
+            s.classList.toggle('active', idx < i);
+          });
+        });
+        sr.appendChild(star);
+      }
+      group.appendChild(sr);
+
+    } else {
+      const inp = document.createElement('input');
+      inp.className = 'form-input';
+      inp.id = 'field_' + field.id;
+      inp.placeholder = field.placeholder;
+      group.appendChild(inp);
+    }
+
+    container.appendChild(group);
+  });
+}
+
+function getFormData() {
+  const data = {};
+  const schema = formSchemas[state.direction] || [];
+  schema.forEach(field => {
+    if (field.type === 'stars') {
+      const el = document.getElementById('field_' + field.id);
+      data[field.id] = el ? parseInt(el.dataset.value) || 5 : 5;
+    } else {
+      const el = document.getElementById('field_' + field.id);
+      data[field.id] = el ? el.value.trim() : '';
+    }
+  });
+  return data;
+}
+
+// ===================== TEMPLATE FILL =====================
+const rng = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+const fillers = {
+  emoji_title: (dir) => {
+    const emojis = emojiSets[dir] || emojiSets.travel;
+    return rng(emojis) + ' ';
+  },
+  companion_intro: (data) => {
+    if (!data.companions) return '';
+    const opts = [`${data.companions}一起来的，`, `和${data.companions}的旅行，`, `${data.companions}同行，`];
+    return rng(opts);
+  },
+  companion_line: (data) => {
+    if (!data.companions) return '';
+    return `和${data.companions}一起，`;
+  },
+  companion_en: (data) => {
+    if (!data.companions) return 'Traveling with ♡';
+    return `Traveling with ${data.companions} ♡`;
+  },
+  companion_short: (data) => {
+    if (!data.companions) return '';
+    return `和${data.companions}，`;
+  },
+  spots_list: (data) => {
+    if (!data.spots) return '• 各处打卡\n• 漫无目的地逛';
+    return data.spots.split(/[，,、\n]/).filter(Boolean).map(s => `• ${s.trim()}`).join('\n');
+  },
+  spots_brief: (data) => {
+    if (!data.spots) return '好几个地方';
+    const spots = data.spots.split(/[，,、\n]/).filter(Boolean);
+    return spots.slice(0,2).join('、') + (spots.length > 2 ? '等' : '');
+  },
+  highlight_short: (data) => {
+    if (!data.highlight) return '惊艳了时光';
+    const h = data.highlight.split(/[。！？\n]/)[0];
+    return h.length > 30 ? h.substring(0, 28) + '...' : h;
+  },
+  n: () => rng(['2','3','4','5','N']),
+  budget_line: (data) => data.budget ? `花费大概${data.budget}` : '花费不贵',
+  mood_ending: (data) => {
+    const mood = data.mood || '超治愈';
+    const opts = [
+      `整体感受：${mood}，推荐所有人来体验！`,
+      `心情：${mood}✨ 这里给了我很大的力量`,
+      `${mood}！有机会一定要来！`,
+    ];
+    return rng(opts);
+  },
+  time_tip: () => rng(['半天~一天', '1-2天', '2-3天', '3-5天']),
+  tips_block: (data) => {
+    if (!data.tips) return '';
+    const tips = data.tips.split(/[\n。]/).filter(s => s.trim());
+    if (tips.length === 0) return '';
+    return '📌 小贴士：\n' + tips.map(t => `✓ ${t.trim()}`).join('\n');
+  },
+  dishes_list: (data) => {
+    if (!data.dishes) return '• 招牌菜';
+    return data.dishes.split(/[，,、\n]/).filter(Boolean).map(d => `• ${d.trim()}`).join('\n');
+  },
+  dish_hero: (data) => {
+    if (!data.dishes) return '招牌菜';
+    return data.dishes.split(/[，,、\n]/).filter(Boolean)[0] || '招牌菜';
+  },
+  taste_detail: (data) => data.taste || '口感层次丰富，回味无穷',
+  who: (data) => data.who || '所有爱美的朋友',
+  not_who: (data) => '想要极简护肤的',
+  pros_list: (data) => {
+    if (!data.pros) return '• 效果显著\n• 颜值在线\n• 性价比高';
+    return data.pros.split(/[，,、\n]/).filter(Boolean).map(p => `• ${p.trim()}`).join('\n');
+  },
+  period: () => rng(['两周', '一个月', '三个月', '半年']),
+  product_belief: () => rng(['好产品真的会说话', '口碑不会骗人', '效果是检验一切的标准']),
+  rating_emoji: (data) => {
+    const v = data.rating || 5;
+    return '⭐'.repeat(Math.min(5, v));
+  },
+  insight: (data) => data.feeling || '一个人也可以很快乐',
+  tags: (dir, platform, data) => generateTags(dir, platform, data),
+  tags_weibo: (dir, platform, data) => generateTags(dir, platform, data, true),
+  tags_en: (dir, data) => generateTagsEn(dir, data),
+  tags_short: (dir, data) => {
+    const t = tagDb[dir] || [];
+    return t.slice(0,3).map(x => `#${x}`).join(' ');
+  },
+};
+
+function generateTags(dir, platform, data, weibo = false) {
+  const base = [...(tagDb[dir] || [])];
+  const dest = data.destination || data.location || data.restaurant || '';
+  const custom = [];
+  if (dest) custom.push(dest, dest + '旅游', dest + '美食');
+  if (data.product) custom.push(data.product, data.brand || '');
+  if (data.type) custom.push(data.type);
+
+  const all = [...custom.filter(Boolean), ...base];
+  const count = platform === 'instagram' ? 12 : platform === 'wechat' ? 0 : 8;
+
+  if (count === 0) return '';
+  const selected = all.slice(0, count);
+
+  if (weibo) return selected.map(t => `#${t}#`).join(' ');
+  return selected.map(t => `#${t}`).join(' ');
+}
+
+function generateTagsEn(dir, data) {
+  const map = {
+    travel: ['travel','explore','wanderlust','traveldiaries','adventure','photography','nature'],
+    food: ['foodie','instafood','yummy','foodphotography','restaurant','delicious'],
+    product: ['beauty','skincare','lifestyle','recommendation','musthave'],
+    default: ['lifestyle','daily','love'],
+  };
+  const tags = map[dir] || map.default;
+  const dest = (data.destination || data.location || '').toLowerCase().replace(/\s/g,'');
+  if (dest) tags.unshift(dest);
+  return tags.slice(0, 10).map(t => `#${t}`).join(' ');
+}
+
+function fillTemplate(template, dir, platform, data) {
+  let result = template;
+
+  // Simple replacements
+  const simpleFields = ['destination','spots','highlight','companions','mood','budget','restaurant',
+    'location','dishes','taste','price','atmosphere','product','brand','feeling','where','pros',
+    'who','topic','subject','days','progress','gain','encourage','type','duration','calories',
+    'change','device','technique','editing','story','item','style','effect','title','summary',
+    'detail','recommend','industry','insight','event','petname','pettype','audience','notes',
+    'tips','dish_hero'];
+
+  simpleFields.forEach(f => {
+    const val = data[f] || '';
+    result = result.replace(new RegExp(`{${f}}`, 'g'), val);
+  });
+
+  // Complex replacements
+  result = result.replace(/{emoji_title}/g, fillers.emoji_title(dir));
+  result = result.replace(/{companion_intro}/g, fillers.companion_intro(data));
+  result = result.replace(/{companion_line}/g, fillers.companion_line(data));
+  result = result.replace(/{companion_en}/g, fillers.companion_en(data));
+  result = result.replace(/{companion_short}/g, fillers.companion_short(data));
+  result = result.replace(/{n}/g, fillers.n());
+  result = result.replace(/{spots_list}/g, fillers.spots_list(data));
+  result = result.replace(/{spots_brief}/g, fillers.spots_brief(data));
+  result = result.replace(/{highlight_short}/g, fillers.highlight_short(data));
+  result = result.replace(/{budget_line}/g, fillers.budget_line(data));
+  result = result.replace(/{mood_ending}/g, fillers.mood_ending(data));
+  result = result.replace(/{time_tip}/g, fillers.time_tip());
+  result = result.replace(/{tips_block}/g, fillers.tips_block(data));
+  result = result.replace(/{dishes_list}/g, fillers.dishes_list(data));
+  result = result.replace(/{dish_hero}/g, fillers.dish_hero(data));
+  result = result.replace(/{taste_detail}/g, fillers.taste_detail(data));
+  result = result.replace(/{who}/g, fillers.who(data));
+  result = result.replace(/{not_who}/g, fillers.not_who(data));
+  result = result.replace(/{pros_list}/g, fillers.pros_list(data));
+  result = result.replace(/{period}/g, fillers.period());
+  result = result.replace(/{product_belief}/g, fillers.product_belief());
+  result = result.replace(/{rating_emoji}/g, fillers.rating_emoji(data));
+  result = result.replace(/{insight}/g, fillers.insight(data));
+  result = result.replace(/{tags_weibo}/g, generateTags(dir, platform, data, true));
+  result = result.replace(/{tags_en}/g, generateTagsEn(dir, data));
+  result = result.replace(/{tags_short}/g, fillers.tags_short(dir, data));
+  result = result.replace(/{tags}/g, generateTags(dir, platform, data));
+
+  return result.replace(/\n{3,}/g, '\n\n').trim();
+}
+
+function getLocalResult(platform, direction, data, count) {
+  const dirTemplates = templates[direction];
+  let templatePool = [];
+
+  if (Array.isArray(dirTemplates)) {
+    templatePool = dirTemplates;
+  } else if (dirTemplates && dirTemplates[platform]) {
+    templatePool = dirTemplates[platform];
+  } else if (dirTemplates && dirTemplates.default) {
+    templatePool = dirTemplates.default;
+  } else if (dirTemplates && dirTemplates.xhs) {
+    templatePool = dirTemplates.xhs;
+  } else {
+    templatePool = templates.travel.xhs;
+  }
+
+  const results = [];
+  for (let i = 0; i < count; i++) {
+    const t = templatePool[i % templatePool.length];
+    results.push(fillTemplate(t, direction, platform, data));
+  }
+  return results;
+}
+
+// ===================== AI GENERATION =====================
+async function generateWithAI(platform, direction, data, count, length, tone, lang, extra) {
+  const s = state.settings;
+  const apiKey = s.apiKey;
+  const baseUrl = (s.apiBaseUrl || 'https://api.openai.com/v1').replace(/\/$/, '');
+  const model = s.customModel || s.model || 'gpt-4o-mini';
+
+  const platformInfo = platforms[platform];
+  const platStyle = platformStyles[platform] || platformStyles.xhs;
+  const lengthMap = { short: '150字以内', medium: '300-600字', long: '600-1200字' };
+  const langMap = { zh: '中文', en: '英文', mixed: '中英文混合' };
+
+  const dataStr = Object.entries(data)
+    .filter(([,v]) => v && v !== '0')
+    .map(([k,v]) => `${k}: ${v}`)
+    .join('\n');
+
+  const systemPrompt = `你是一位专业的社交媒体文案创作专家，精通各大平台的文案风格。
+平台：${platformInfo.name}
+平台特点：${platStyle.features.join('、')}
+字数要求：${lengthMap[length]}
+语气：${tone}
+语言：${langMap[lang]}
+${extra ? '补充要求：' + extra : ''}
+生成${count}条不同版本的文案，用"---"分隔，每条都要包含适合该平台的hashtag标签。
+直接输出文案内容，不要序号或额外说明。`;
+
+  const userPrompt = `内容方向：${direction}
+用户提供的信息：
+${dataStr || '（用户未填写具体信息，请自由发挥创作）'}`;
+
+  const response = await fetch(`${baseUrl}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: parseInt(s.maxTokens) || 2000,
+      temperature: parseFloat(s.temperature) || 0.85,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error?.message || `HTTP ${response.status}`);
+  }
+
+  const json = await response.json();
+  const text = json.choices?.[0]?.message?.content || '';
+  return text.split(/---+/).map(s => s.trim()).filter(Boolean).slice(0, count);
+}
+
+// ===================== GENERATE =====================
+async function generate() {
+  const data = getFormData();
+  const platform = state.platform;
+  const direction = state.direction;
+  const tone = state.tone;
+  const length = state.length;
+  const count = state.count;
+  const lang = document.getElementById('langSelect').value;
+  const extra = document.getElementById('extraInstructions').value;
+
+  const btn = document.getElementById('generateBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('resultsContainer').style.display = 'flex';
+  document.getElementById('resultsContainer').style.flexDirection = 'column';
+
+  // Show skeleton
+  const rc = document.getElementById('resultsContainer');
+  rc.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    rc.innerHTML += `<div class="result-card" style="padding:24px;animation-delay:${i*0.1}s">
+      <div class="skeleton" style="height:20px;width:60%;margin-bottom:12px;"></div>
+      <div class="skeleton" style="height:14px;width:100%;margin-bottom:8px;"></div>
+      <div class="skeleton" style="height:14px;width:90%;margin-bottom:8px;"></div>
+      <div class="skeleton" style="height:14px;width:80%;margin-bottom:8px;"></div>
+      <div class="skeleton" style="height:14px;width:70%;"></div>
+    </div>`;
+  }
+
+  let results = [];
+  let usedAI = false;
+
+  try {
+    if (state.settings.apiKey) {
+      results = await generateWithAI(platform, direction, data, count, length, tone, lang, extra);
+      usedAI = true;
+    } else {
+      await new Promise(r => setTimeout(r, 800));
+      results = getLocalResult(platform, direction, data, count);
+    }
+  } catch (e) {
+    showToast('AI生成失败：' + e.message + ' · 已使用本地模板', 'error');
+    await new Promise(r => setTimeout(r, 400));
+    results = getLocalResult(platform, direction, data, count);
+  }
+
+  // Adjust length
+  results = results.map(r => adjustLength(r, length));
+
+  // Render
+  rc.innerHTML = '';
+  const platInfo = platforms[platform];
+  const platClass = `platform-${platform}`;
+
+  results.forEach((text, idx) => {
+    const lines = text.split('\n');
+    const titleLine = lines[0] || '生成的文案';
+    const bodyLines = lines.slice(1).join('\n').trim();
+    const tagsLine = extractTags(text);
+    const bodyNoTags = removeTagsLine(bodyLines);
+    const score = 75 + Math.floor(Math.random() * 22);
+
+    const card = document.createElement('div');
+    card.className = `result-card ${platClass}`;
+    card.style.animationDelay = idx * 0.12 + 's';
+    card.style.setProperty('--platform-color', platInfo.color);
+
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="card-platform-badge">
+          <div class="platform-dot"></div>
+          ${platInfo.emoji} ${platInfo.name}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="card-version">版本 ${idx + 1}</div>
+          ${usedAI ? '<span style="font-size:10px;color:var(--gold);border:1px solid rgba(201,168,76,0.3);border-radius:4px;padding:1px 6px;">AI</span>' : '<span style="font-size:10px;color:var(--text3);border:1px solid var(--border);border-radius:4px;padding:1px 6px;">模板</span>'}
+        </div>
+        <div class="card-actions">
+          <button class="card-btn fav-btn" onclick="toggleFav(this, ${idx})" title="收藏">♡ 收藏</button>
+          <button class="card-btn copy-btn" onclick="copyCard(this, ${idx})" title="复制全文">⎘ 复制</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="edit-hint">✎ 点击文案可直接编辑</div>
+        <div class="copy-title" contenteditable="true" spellcheck="false">${escapeHtml(titleLine)}</div>
+        ${bodyNoTags ? `<div class="copy-content" contenteditable="true" spellcheck="false">${escapeHtml(bodyNoTags)}</div>` : ''}
+        <div class="score-bar">
+          <span>传播指数</span>
+          <div class="score-track"><div class="score-fill" style="width:0%" data-target="${score}"></div></div>
+          <span style="color:var(--gold);font-weight:600;">${score}</span>
+        </div>
+      </div>
+      ${tagsLine ? `<div class="card-footer">
+        <div class="tags-line" data-tags="${escapeHtml(tagsLine)}">${escapeHtml(tagsLine)}</div>
+        <button class="card-btn" style="margin-top:8px;font-size:11px;" onclick="copyTags(this)">复制标签</button>
+      </div>` : ''}
+    `;
+
+    rc.appendChild(card);
+  });
+
+  // Animate score bars
+  setTimeout(() => {
+    document.querySelectorAll('.score-fill').forEach(el => {
+      el.style.width = el.dataset.target + '%';
+    });
+  }, 300);
+
+  // Save to history
+  const histItem = {
+    id: Date.now(),
+    platform,
+    direction,
+    summary: (results[0] || '').split('\n')[0].substring(0, 50),
+    results,
+    data,
+    time: new Date().toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'}),
+  };
+  state.history.unshift(histItem);
+  if (state.history.length > 30) state.history.pop();
+  localStorage.setItem('cs_history', JSON.stringify(state.history));
+  renderHistory();
+
+  btn.classList.remove('loading');
+  btn.disabled = false;
+  showToast(usedAI ? '✦ AI 生成完成！' : '✦ 文案生成完成！', 'success');
+}
+
+function adjustLength(text, length) {
+  if (length === 'short') {
+    const lines = text.split('\n');
+    const tags = lines.filter(l => l.startsWith('#')).join('\n');
+    const content = lines.filter(l => !l.startsWith('#'));
+    return content.slice(0, 8).join('\n') + (tags ? '\n\n' + tags : '');
+  }
+  if (length === 'long') return text;
+  return text;
+}
+
+function extractTags(text) {
+  const lines = text.split('\n');
+  const tagLines = lines.filter(l => l.trim().startsWith('#') || (l.includes('#') && l.indexOf('#') === 0));
+  return tagLines.join(' ').trim();
+}
+
+function removeTagsLine(text) {
+  return text.split('\n').filter(l => !(l.trim().startsWith('#'))).join('\n').trim();
+}
+
+function escapeHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ===================== COPY =====================
+function copyCard(btn, idx) {
+  const card = btn.closest('.result-card');
+  const title = card.querySelector('.copy-title')?.innerText || '';
+  const content = card.querySelector('.copy-content')?.innerText || '';
+  const tags = card.querySelector('.tags-line')?.innerText || '';
+  const full = [title, content, tags].filter(Boolean).join('\n\n');
+
+  navigator.clipboard.writeText(full).then(() => {
+    btn.classList.add('copied');
+    btn.textContent = '✓ 已复制';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '⎘ 复制';
+    }, 2000);
+    showToast('✓ 复制成功！', 'success');
+  }).catch(() => {
+    fallbackCopy(full);
+  });
+}
+
+function copyTags(btn) {
+  const tags = btn.previousElementSibling?.dataset.tags || btn.previousElementSibling?.innerText || '';
+  navigator.clipboard.writeText(tags).then(() => {
+    btn.textContent = '✓ 已复制';
+    setTimeout(() => { btn.textContent = '复制标签'; }, 2000);
+    showToast('标签已复制！', 'success');
+  });
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  showToast('✓ 复制成功！', 'success');
+}
+
+// ===================== FAVORITES =====================
+function toggleFav(btn, idx) {
+  btn.classList.toggle('active');
+  if (btn.classList.contains('active')) {
+    btn.textContent = '♥ 已收藏';
+    showToast('已加入收藏', 'success');
+  } else {
+    btn.textContent = '♡ 收藏';
+  }
+}
+
+// ===================== HISTORY =====================
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (!state.history.length) {
+    list.innerHTML = '<div class="history-empty">暂无历史记录</div>';
+    return;
+  }
+  list.innerHTML = state.history.map((item, i) => `
+    <div class="history-item" onclick="loadHistory(${i})">
+      <span style="font-size:18px;">${platforms[item.platform]?.emoji || '📝'}</span>
+      <div class="history-item-text">${escapeHtml(item.summary) || '文案记录'}</div>
+      <div class="history-item-meta">${item.time}</div>
+    </div>
+  `).join('');
+}
+
+function loadHistory(idx) {
+  const item = state.history[idx];
+  if (!item) return;
+
+  selectPlatformByKey(item.platform);
+  selectDirectionByKey(item.direction);
+
+  setTimeout(() => {
+    const schema = formSchemas[item.direction] || [];
+    schema.forEach(field => {
+      const el = document.getElementById('field_' + field.id);
+      if (el && item.data[field.id]) {
+        if (field.type === 'stars') {
+          el.dataset.value = item.data[field.id];
+          el.querySelectorAll('.star').forEach((s,i2) => s.classList.toggle('active', i2 < item.data[field.id]));
+        } else {
+          el.value = item.data[field.id];
+        }
+      }
+    });
+
+    const rc = document.getElementById('resultsContainer');
+    rc.style.display = 'flex';
+    rc.style.flexDirection = 'column';
+    document.getElementById('emptyState').style.display = 'none';
+    // Just trigger regeneration
+    generate();
+  }, 100);
+}
+
+function clearHistory() {
+  state.history = [];
+  localStorage.removeItem('cs_history');
+  renderHistory();
+  showToast('历史记录已清空', 'success');
+}
+
+function toggleHistoryPanel() {
+  const p = document.getElementById('historyPanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  renderHistory();
+}
+
+// ===================== QUICK FILL =====================
+const quickExamples = {
+  travel: { destination: '京都', spots: '伏见稻荷大社、嵐山竹林、清水寺', highlight: '清晨五点的伏见稻荷，没有人群，只有薄雾和无数鸟居，像进入了另一个世界', companions: '男友', mood: '超治愈', budget: '5000元' },
+  food: { restaurant: '和牛研究所', location: '上海虹桥', dishes: '极品和牛烤肉、松茸锅巴、抹茶冰淇淋', taste: '入口即化、鲜美无比', price: '380元', atmosphere: '昏黄灯光、原木装潢，超适合拍照' },
+  product: { product: 'La Mer海蓝之谜精华水', brand: 'La Mer', price: '1680元', where: '官方旗舰店', feeling: '用了两周皮肤变得嫩嫩的，明显感觉更水润了，毛孔也细了很多，早晚都在用' , pros: '保湿效果好、气味高级、上脸不搓泥', who: '干皮、混干皮' },
+  fitness: { type: '力量训练+跑步', duration: '60分钟', calories: '420kcal', feeling: '今天突破了自己的深蹲记录，虽然很累但超开心', change: '两个月减了8斤，线条明显了', days: 'Day 62' },
+};
+
+function quickFill(dir) {
+  selectDirectionByKey(dir);
+  setTimeout(() => {
+    const ex = quickExamples[dir];
+    if (!ex) return;
+    Object.entries(ex).forEach(([k, v]) => {
+      const el = document.getElementById('field_' + k);
+      if (el) el.value = v;
+    });
+  }, 100);
+}
+
+// ===================== SELECTION HANDLERS =====================
+function selectPlatform(card) {
+  document.querySelectorAll('.platform-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  state.platform = card.dataset.platform;
+}
+
+function selectPlatformByKey(key) {
+  const card = document.querySelector(`.platform-card[data-platform="${key}"]`);
+  if (card) selectPlatform(card);
+}
+
+function selectDirection(tag) {
+  document.querySelectorAll('.direction-tag').forEach(t => t.classList.remove('active'));
+  tag.classList.add('active');
+  state.direction = tag.dataset.dir;
+  renderForm(state.direction);
+}
+
+function selectDirectionByKey(key) {
+  const tag = document.querySelector(`.direction-tag[data-dir="${key}"]`);
+  if (tag) selectDirection(tag);
+}
+
+// Tone pills
+document.querySelectorAll('.tone-pill').forEach(pill => {
+  pill.addEventListener('click', function() {
+    document.querySelectorAll('.tone-pill').forEach(p => p.classList.remove('active'));
+    this.classList.add('active');
+    state.tone = this.dataset.tone;
+  });
+});
+
+// Length options
+document.querySelectorAll('.length-opt').forEach(opt => {
+  opt.addEventListener('click', function() {
+    document.querySelectorAll('.length-opt').forEach(o => o.classList.remove('active'));
+    this.classList.add('active');
+    state.length = this.dataset.len;
+  });
+});
+
+// Count
+function changeCount(delta) {
+  state.count = Math.max(1, Math.min(5, state.count + delta));
+  document.getElementById('countDisplay').textContent = state.count;
+}
+
+// Advanced toggle
+function toggleAdv() {
+  const toggle = document.getElementById('advToggle');
+  const content = document.getElementById('advContent');
+  toggle.classList.toggle('open');
+  content.classList.toggle('open');
+}
+
+// ===================== SETTINGS =====================
+const providerDefaults = {
+  openai:   { url: 'https://api.openai.com/v1', model: 'gpt-4o-mini' },
+  claude:   { url: 'https://api.anthropic.com/v1', model: 'claude-3-5-sonnet-20241022' },
+  deepseek: { url: 'https://api.deepseek.com/v1', model: 'deepseek-chat' },
+  qwen:     { url: 'https://dashscope.aliyuncs.com/compatible-mode/v1', model: 'qwen-turbo' },
+  moonshot: { url: 'https://api.moonshot.cn/v1', model: 'moonshot-v1-8k' },
+  custom:   { url: '', model: '' },
+};
+
+function selectProvider(card) {
+  document.querySelectorAll('.provider-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  const prov = card.dataset.provider;
+  const defaults = providerDefaults[prov] || {};
+  if (defaults.url) document.getElementById('apiBaseUrl').value = defaults.url;
+  if (defaults.model) {
+    const sel = document.getElementById('modelSelect');
+    const opt = [...sel.options].find(o => o.value === defaults.model);
+    if (opt) sel.value = defaults.model;
+    else { sel.value = 'custom'; document.getElementById('customModelInput').value = defaults.model; }
+    onModelSelectChange();
+  }
+}
+
+function onModelSelectChange() {
+  const v = document.getElementById('modelSelect').value;
+  document.getElementById('customModelGroup').style.display = v === 'custom' ? 'block' : 'none';
+}
+
+function openSettings() {
+  const s = state.settings;
+  if (s.apiBaseUrl) document.getElementById('apiBaseUrl').value = s.apiBaseUrl;
+  if (s.apiKey) document.getElementById('apiKey').value = s.apiKey;
+  if (s.model) {
+    const sel = document.getElementById('modelSelect');
+    const opt = [...sel.options].find(o => o.value === s.model);
+    if (opt) sel.value = s.model;
+    else { sel.value = 'custom'; document.getElementById('customModelInput').value = s.model; }
+    onModelSelectChange();
+  }
+  if (s.temperature) document.getElementById('temperature').value = s.temperature;
+  if (s.maxTokens) document.getElementById('maxTokens').value = s.maxTokens;
+  updateApiStatus();
+  document.getElementById('settingsModal').classList.add('open');
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('open');
+}
+
+function closeSettingsOutside(e) {
+  if (e.target === document.getElementById('settingsModal')) closeSettings();
+}
+
+function saveSettings() {
+  const model = document.getElementById('modelSelect').value;
+  const customModel = document.getElementById('customModelInput').value;
+
+  state.settings = {
+    apiBaseUrl: document.getElementById('apiBaseUrl').value.trim(),
+    apiKey: document.getElementById('apiKey').value.trim(),
+    model: model === 'custom' ? customModel : model,
+    customModel: model === 'custom' ? customModel : null,
+    temperature: document.getElementById('temperature').value,
+    maxTokens: document.getElementById('maxTokens').value,
+  };
+
+  localStorage.setItem('cs_settings', JSON.stringify(state.settings));
+  updateApiStatusTip();
+  closeSettings();
+  showToast('✓ 设置已保存', 'success');
+}
+
+async function testApiConnection() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const baseUrl = (document.getElementById('apiBaseUrl').value.trim() || 'https://api.openai.com/v1').replace(/\/$/,'');
+  const model = document.getElementById('modelSelect').value === 'custom'
+    ? document.getElementById('customModelInput').value
+    : document.getElementById('modelSelect').value;
+
+  if (!apiKey) { showToast('请先填写 API Key', 'error'); return; }
+
+  document.getElementById('apiStatusText').textContent = '测试中...';
+  document.getElementById('apiStatusDot').className = 'status-dot';
+
+  try {
+    const resp = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`, 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model, max_tokens: 10, messages: [{ role: 'user', content: 'Hi' }] }),
+    });
+    if (resp.ok || resp.status === 200) {
+      document.getElementById('apiStatusDot').className = 'status-dot connected';
+      document.getElementById('apiStatusText').textContent = '连接成功 ✓';
+      showToast('✓ API 连接成功！', 'success');
+    } else {
+      throw new Error(`HTTP ${resp.status}`);
+    }
+  } catch (e) {
+    document.getElementById('apiStatusDot').className = 'status-dot error';
+    document.getElementById('apiStatusText').textContent = '连接失败: ' + e.message;
+    showToast('连接失败: ' + e.message, 'error');
+  }
+}
+
+function updateApiStatus() {
+  const hasKey = !!(state.settings.apiKey);
+  document.getElementById('apiStatusDot').className = 'status-dot' + (hasKey ? ' connected' : '');
+  document.getElementById('apiStatusText').textContent = hasKey ? `已配置 · ${state.settings.model || 'gpt-4o-mini'}` : '未配置';
+}
+
+function updateApiStatusTip() {
+  const tip = document.getElementById('apiStatusTip');
+  if (state.settings.apiKey) {
+    tip.innerHTML = `🤖 AI 模式：${state.settings.model || 'gpt-4o-mini'} · <span style="color:var(--gold);cursor:pointer;" onclick="openSettings()">修改设置</span>`;
+  } else {
+    tip.innerHTML = `🤖 使用内置模板引擎 · <span style="color:var(--gold);cursor:pointer;" onclick="openSettings()">接入AI获得更好效果</span>`;
+  }
+}
+
+// ===================== TOAST =====================
+function showToast(msg, type = 'success') {
+  const toast = document.getElementById('toast');
+  const icon = document.getElementById('toastIcon');
+  const msgEl = document.getElementById('toastMsg');
+
+  icon.textContent = type === 'success' ? '✓' : '⚠';
+  msgEl.textContent = msg;
+  toast.className = `toast ${type} show`;
+
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { toast.className = `toast ${type}`; }, 2800);
+}
+
+// ===================== KEYBOARD =====================
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeSettings();
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') generate();
+});
+
+// ===================== INIT =====================
+renderForm('travel');
+renderHistory();
+updateApiStatusTip();
+
+// Hint for keyboard
+setTimeout(() => {
+  showToast('💡 Ctrl+Enter 快速生成文案', 'success');
+}, 1500);
+</script>
+</body>
+</html>
