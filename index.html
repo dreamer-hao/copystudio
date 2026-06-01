@@ -1684,285 +1684,1049 @@ const platformStyles = {
 };
 
 // ===================== TEMPLATE ENGINE =====================
+// Each direction has templates keyed by platform; fallback to 'default'.
+// Templates deliberately avoid clichéd openers and vary greatly in structure,
+// angle, length and register. {placeholder} tokens are replaced at render time.
 const templates = {
+
+  // ─────────────────── TRAVEL ───────────────────
   travel: {
     xhs: [
-      `{emoji_title}✈️ {destination}｜{highlight_short}被这里治愈了
+      // Route-focused / itinerary style
+      `{e} {destination} · 行程路线分享
 
-{companion_intro}来{destination}已经是第{n}次了，但每次都有新的惊喜🌿
+{companion_intro}这次{destination}之行打算记录下来，顺便整理成路线给有需要的人。
 
-📍 必去打卡：
+📍 Day 1
 {spots_list}
 
-✨ 最难忘的瞬间：
+✨ 最值得多待一会儿的地方：{highlight_short}
+
+{tips_block}
+
+💰 人均参考：{budget}
+
+整体感受：{mood}，{destination}是那种去了就不想走的地方。
+
+{tags}`,
+
+      // Sensory / immersive style
+      `{e} {destination}·某一天的碎片记录
+
 {highlight}
 
-💰 费用参考：{budget}
-🕐 建议游玩时间：{time_tip}
+{companion_line}没有提前查太多攻略，就是跟着感觉走。
 
-{mood_ending}
-
-{tips_block}
-
-{tags}`,
-      `{destination}这趟说走就走的旅行，值得！🌸
-
-老实说出发前都没攻略，就拎着一个包来了{destination}
-{companion_line}
-
-一共去了：
+路过了：
 {spots_list}
 
-最让我心动的是——{highlight}
-{mood}到甚至觉得不想回去了💭
-
-{budget_line}
+走到脚酸但值得。{mood}。{budget_line}。
 
 {tips_block}
 
-姐妹们有去过{destination}的吗？交流一下👇
+{tags}`,
+
+      // Practical recommendation angle
+      `去{destination}前，我希望有人告诉我这些 {e}
+
+{companion_intro}总结了这次{destination}行程里踩过的坑和真正好用的信息——
+
+行程：
+{spots_list}
+
+最推荐的一处：{highlight_short}
+理由：{highlight}
+
+{tips_block}
+
+花费：{budget_line}
+感受：{mood}
+
+希望对计划去{destination}的人有用 ↓
+
+{tags}`,
+
+      // Pure narrative / story angle
+      `{e} 关于{destination}，有件事我一直想写下来
+
+{highlight}
+
+{companion_line}那天{spots_brief}，{mood}。
+
+有些地方去了才知道为什么值得千里迢迢。
+
+{tips_block}
+
+{tags}`,
+
+      // Checklist style
+      `{destination} 实用清单 {e}
+
+✅ 这次去到了：
+{spots_list}
+
+⭐ 强烈推荐：{highlight_short}
+💡 小建议：{tips_block}
+💰 预算参考：{budget_line}
+{companion_line}总结：{mood}
+
+存起来备用吧~
 
 {tags}`,
     ],
+
     douyin: [
-      `去了{destination}才知道什么叫真正的治愈💚
+      `{destination}真的值得去一次 {e}
 
-{spots_brief}
+这次{companion_short}玩了{spots_brief}
 
-最惊艳的一幕：{highlight_short}
+最想让你们看到的：{highlight_short}
 
-{companion_short}花了大概{budget}，超值！
+{tips_block}
 
-{mood}！快来{destination}！
+{budget_line} · {mood}
+
+评论区说你们最想去哪
+
+{tags}`,
+
+      `分享一条{destination}冷门路线 {e}
+
+避开热门景点，这次去了：
+{spots_list}
+
+亮点：{highlight_short}
+
+人不多、{mood}，{budget_line}
+
+这种地方多藏着几个就好了
+
+{tags}`,
+
+      `{destination}旅行复盘 {e}
+
+{spots_brief}，{companion_short}，{budget_line}
+
+最值的一处：{highlight_short}
+踩坑：有，但不多
+推荐：{mood}
+
+想了解哪段评论告诉我
 
 {tags}`,
     ],
+
     weibo: [
-      `刚从{destination}回来，整个人都治愈了✨
+      `{destination}游记｜{highlight_short}
 
-{companion_line}一共玩了{spots_brief}，最爱的是{highlight_short}，{mood}。
+{companion_line}这趟行程走了{spots_brief}，整体{mood}。
 
-推荐指数⭐️⭐️⭐️⭐️⭐️，花费大概{budget}，有想去的朋友欢迎私信，可以给你们分享路线！
+最让我印象深刻的是{highlight}
+
+{tips_block}
+
+{budget_line}，对旅费要求不高的话非常推荐。有问题欢迎留言～
+
+{tags_weibo}`,
+
+      `刚整理完{destination}的照片，忍不住分享一下 ✈️
+
+{companion_line}
+
+打卡了：{spots_brief}
+
+{highlight}
+
+{mood}，感觉充电满满回来了。{tips_block}
+
+有在规划{destination}行程的可以私信我，交流一下
+
+{tags_weibo}`,
+
+      `{destination}·行程总结
+
+D1-D{n}：{spots_list}
+
+个人评价：{mood}
+亮点：{highlight_short}
+费用：{budget_line}
+{companion_line}
 
 {tips_block}
 
 {tags_weibo}`,
     ],
+
     wechat: [
-      `刚结束{destination}的旅行，整个人状态好到炸✨
+      `{destination}回来了。
 
-{companion_line}
+{companion_line}{spots_brief}，{highlight_short}。{mood}。
 
-印象最深的是{highlight_short}，{mood}，拍了好多照片。
+{budget_line}。下次还想去。`,
 
-{budget_line}，下次还想去！`,
+      `在{destination}的那几天，{highlight}
+
+{companion_line}走了{spots_brief}，没有特别赶的行程，就是漫无目的地转。
+
+{mood}，这种感觉很久没有了。`,
+
+      `{destination}小记
+
+{spots_list}
+
+最喜欢的一处是{highlight_short}——{highlight}
+
+{companion_line}{budget_line}。不枉此行。`,
     ],
+
     instagram: [
-      `Lost in {destination} ✨
+      `{e} {destination}
 
 {highlight}
 
 {companion_en}
 
-Loving every moment here 🌿
+{tags_en}`,
+
+      `Wandering through {destination} 🌿
+
+Every corner here has something worth slowing down for.
+
+{highlight}
+
+{companion_en} · {budget_line}
+
+{tags_en}`,
+
+      `{destination} — places I'll keep coming back to {e}
+
+{spots_brief}
+
+{highlight}
 
 {tags_en}`,
     ],
+
     twitter: [
-      `刚从{destination}回来，被{highlight_short}震撼到了😭 下次还去！{tags_short}`,
+      `{destination}刚回来，脑子里还是{highlight_short}那个画面。{tags_short}`,
+      `{companion_short}在{destination}走了{spots_brief}，{mood}。推荐有机会去。{tags_short}`,
+      `{destination}路线简版：{spots_brief}。{highlight_short}是最大惊喜。{budget_line}。{tags_short}`,
     ],
+
+    tiktok: [
+      `{destination}这条路线我强推 {e}
+
+{spots_brief}
+
+{highlight_short}
+
+{companion_short}{budget_line}
+
+评论区问我哪段最值得！
+
+{tags}`,
+
+      `在{destination}随手拍的，没想到这么出片 {e}
+
+{highlight_short}
+
+{spots_brief}
+
+{mood}，这地方真的藏着不少惊喜
+
+{tags}`,
+    ],
+
+    bilibili: [
+      `{destination}旅行vlog | {spots_brief}全记录 {e}
+
+{companion_intro}
+
+行程概览：
+{spots_list}
+
+最惊艳的片段：{highlight}
+
+{tips_block}
+
+{budget_line}，整体{mood}，感兴趣的可以收藏这条路线～
+
+{tags}`,
+    ],
+
+    zhihu: [
+      `去{destination}旅行是什么体验？
+
+{companion_intro}分享一次真实的{destination}行程。
+
+行程：{spots_list}
+
+最值得说的是{highlight_short}。{highlight}
+
+关于费用，{budget_line}。整体评价：{mood}。
+
+{tips_block}
+
+如果有人在规划{destination}行程，欢迎留言交流。`,
+    ],
+
     default: [
-      `{emoji_title}{destination}旅行记录
+      `{e} {destination} 旅行记录
 
-{companion_intro}{spots_list}
+{companion_intro}
 
-最难忘：{highlight}
+行程：
+{spots_list}
 
-{mood}！{budget_line}
+亮点：{highlight}
+{mood} · {budget_line}
+
+{tips_block}
 
 {tags}`,
     ],
   },
+
+  // ─────────────────── FOOD ───────────────────
   food: {
     xhs: [
-      `在{location}发现了一家宝藏餐厅！！{rating_emoji}
+      // Data-focused review
+      `{e} 探店｜{restaurant}
 
-📍 {restaurant}
-📌 地址：{location}
+📍 {location}
+💰 人均：{price}
+⭐ 评分：{rating_emoji}
 
-🍽️ 点了这些：
+这次点了：
 {dishes_list}
 
-口味：{taste}
+口感：{taste}
 
-✨ 最惊艳的是：点了{dish_hero}，{taste_detail}，这辈子都忘不掉！
+环境：{atmosphere}
 
-🏠 环境：{atmosphere}
+重点说一下{dish_hero}，{taste_detail}——这道菜值回票价。
 
-💰 人均：{price}
+{tips_block}
 
-强烈推荐{who}来这里！去{location}的姐妹收好这篇！
+适合：去{location}的时候顺路，或者专程来都不亏。
 
 {tags}`,
-      `{restaurant}｜这就是我愿意排队的原因😭
 
-{location}藏着宝藏美食！
+      // Story-first approach
+      `{restaurant} | 今天的惊喜 {e}
 
-必点：{dishes}
+路过{location}，就进去了。没抱太高期待，但{taste_detail}。
+
+点了{dishes}，{taste}，{atmosphere}。
+
+人均{price}，{rating_emoji}。
+
+{dish_hero}是必点，其他的按个人口味选。
+
+{tips_block}
+
+{tags}`,
+
+      // Comparison / verdict style
+      `在{location}吃了很多家，{restaurant}算得上前几名 {e}
+
+菜单上试了：{dishes}
+口味：{taste}
+环境：{atmosphere}
+价位：{price}
+
+{taste_detail}
+
+值得来的理由：{dish_hero}是这里的特色，做法和别家不同，{taste}。
+
+{rating_emoji}，下次还会再去。
+
+{tags}`,
+
+      // Minimal / punchy style
+      `{restaurant} {e}
+
+地址：{location}
+推荐菜：{dishes}
+必点：{dish_hero}
 口味：{taste}
 环境：{atmosphere}
 人均：{price}
 
 {taste_detail}
 
-{rating_emoji} 推荐指数爆表，建议大家去了一定要点{dish_hero}！
+评分：{rating_emoji}
 
 {tags}`,
     ],
-    default: [
-      `📍{restaurant}探店报告
 
-地点：{location}
-推荐菜：{dishes}
-口味：{taste}
-人均：{price}
+    douyin: [
+      `{location}这家{restaurant}真的没话说 {e}
+
+必点{dish_hero}，{taste_detail}
+
+{taste}，{atmosphere}
+
+人均{price}，{rating_emoji}
+
+周末去记得早点到
+
+{tags}`,
+
+      `探店{restaurant} | 值不值自己判断 {e}
+
+点了{dishes}
+{taste}
 环境：{atmosphere}
-评价：{rating_emoji}
+价格：{price}
 
 {taste_detail}
+
+{rating_emoji} 我的评价就这样
+
+{tags}`,
+    ],
+
+    weibo: [
+      `探店｜{restaurant}@{location}
+
+菜：{dishes}
+口味：{taste}
+环境：{atmosphere}
+人均：{price}
+评分：{rating_emoji}
+
+最推荐的是{dish_hero}，{taste_detail}。
+
+有去{location}的可以收藏这篇，值得专程跑一趟。
+
+{tags_weibo}`,
+    ],
+
+    wechat: [
+      `{location}附近发现一家{restaurant}，{taste}，推荐{dish_hero}，人均{price}。{mood_food}`,
+
+      `今天吃了{restaurant}，点了{dishes}。
+
+{taste_detail}
+
+环境：{atmosphere}
+价格：{price}
+评价：{rating_emoji}
+
+下次还来。`,
+    ],
+
+    instagram: [
+      `{e} {restaurant}, {location}
+
+{taste_detail}
+
+{dishes} · {price} per person
+
+{tags_en}`,
+    ],
+
+    twitter: [
+      `{restaurant}（{location}）探店回来，{dish_hero}真的不错，{taste}。人均{price}。{rating_emoji} {tags_short}`,
+    ],
+
+    default: [
+      `📍 {restaurant} 探店
+
+地点：{location}
+推荐：{dishes}
+口味：{taste}
+环境：{atmosphere}
+价格：{price}
+
+{taste_detail}
+
+{rating_emoji}
 
 {tags}`,
     ],
   },
+
+  // ─────────────────── PRODUCT ───────────────────
   product: {
     xhs: [
-      `种草警告⚠️ {product}这真的绝了！！
-
-{brand}出的{product}，之前一直听姐妹们推荐，这次终于入手了！
-
-💰 价格：{price}
-🛒 购买：{where}
-
-🌿 使用感受：
-{feeling}
-
-✅ 优点：
-{pros_list}
-
-👥 适合人群：{who}
-
-用了{period}了，真的回购N次！强烈推荐给所有{who}，真的不踩雷！
-
-{tags}`,
-      `救命！{product}真的救了我！😭
-
-我是{who}星人，用过无数产品踩过无数雷
-直到遇到{brand}的{product}——
-
-{feeling}
-
-这件事情让我彻底相信{product_belief}
-
-价格：{price} | 购买渠道：{where}
-
-适合：{who}
-不适合：{not_who}
-
-{tags}`,
-    ],
-    default: [
-      `好物推荐：{product}
+      // Honest review angle
+      `用了{period}，说说{product}的真实感受 {e}
 
 品牌：{brand}
+购入渠道：{where}
 价格：{price}
-购买：{where}
 
 使用感受：
 {feeling}
 
-优点：{pros_list}
+优点：
+{pros_list}
+
 适合人群：{who}
+
+不建议入手的情况：{not_who}
+
+综合来看，{product_belief}。回购意愿：{period}以后还在用就能说明问题了。
+
+{tags}`,
+
+      // Problem-solution angle
+      `一直有{who}的困扰，直到用了{product} {e}
+
+{brand}，价格{price}，在{where}买的。
+
+{feeling}
+
+试过很多同类产品，这款的不同之处在于：
+{pros_list}
+
+注意：{not_who}可能不太适合。
+
+{product_belief}，目前是{period}老用户。
+
+{tags}`,
+
+      // Comparison / test approach
+      `{product}测评来了，说几个真实使用场景 {e}
+
+📦 {brand} · {price} · {where}
+
+场景一：{feeling}
+优点：{pros_list}
+
+适合：{who}
+不适合：{not_who}
+
+{product_belief}
+
+{tags}`,
+
+      // Minimal / list-style
+      `{product} · 使用记录 {e}
+
+品牌：{brand}
+价格：{price}
+购买：{where}
+用了多久：{period}
+
+感受：{feeling}
+
+优点：{pros_list}
+
+适合：{who}
+
+{tags}`,
+    ],
+
+    douyin: [
+      `{product}用了{period}，说几句真心话 {e}
+
+{feeling}
+
+优点：{pros_list}
+
+价格{price}，{where}有
+
+适合{who}
+
+{product_belief}
+
+{tags}`,
+
+      `{brand}的{product}，入手前你需要知道这些 {e}
+
+价格：{price}
+适合：{who}
+不适合：{not_who}
+
+{feeling}
+
+{product_belief}
+
+{tags}`,
+    ],
+
+    weibo: [
+      `分享一个用了{period}的{product}
+
+品牌{brand}，{price}，{where}买的。
+
+{feeling}
+
+优点：{pros_list}
+
+适合{who}，{not_who}的话建议先观望。
+
+{product_belief}
+
+{tags_weibo}`,
+    ],
+
+    wechat: [
+      `推荐一个最近在用的{product}，{brand}的，{price}左右，{feeling}。适合{who}。`,
+
+      `{product}用了{period}，{feeling}。{pros_list}。价格{price}，在{where}有。`,
+    ],
+
+    instagram: [
+      `{e} Honest review: {product} by {brand}
+
+{feeling}
+
+Price: {price} · Available at {where}
+Best for: {who}
+
+{tags_en}`,
+    ],
+
+    twitter: [
+      `{product}（{brand}）用了{period}，{feeling}。{price}，{where}买的，适合{who}。{tags_short}`,
+    ],
+
+    default: [
+      `好物分享：{product}
+
+品牌：{brand}
+价格：{price}
+购买：{where}
+用了：{period}
+
+感受：{feeling}
+优点：{pros_list}
+适合：{who}
 
 {tags}`,
     ],
   },
-  guide: [
-    `{topic}超实用攻略来了！收藏备用❤️‍🔥
 
-适合人群：{audience}
+  // ─────────────────── GUIDE ───────────────────
+  guide: {
+    xhs: [
+      `{topic} · 干货整理版 {e}
+
+适合：{audience}
 预算参考：{budget}
 
-【核心干货】
+核心要点：
 {tips}
 
-【注意事项⚠️】
+注意事项：
 {notes}
 
-这篇攻略是我亲测有效的，建议收藏！有问题欢迎评论区问我～
+这些是亲测有效的，按实际需要选用。
 
 {tags}`,
-  ],
+
+      `整理了一份{topic}，给需要的人 {e}
+
+写这篇的原因：{audience}可能都遇到过同样的困惑。
+
+📌 关键信息：
+{tips}
+
+⚠️ 容易踩坑的地方：
+{notes}
+
+预算参考：{budget}
+
+建议收藏备用，有补充欢迎评论区交流。
+
+{tags}`,
+
+      `{topic}，不废话直接说重点 {e}
+
+{tips}
+
+额外提醒：
+{notes}
+
+适合：{audience}
+预算：{budget}
+
+{tags}`,
+    ],
+
+    douyin: [
+      `{topic}攻略，5条最关键的 {e}
+
+{tips}
+
+适合{audience}
+预算约{budget}
+
+注意：{notes}
+
+收藏好，用到的时候翻出来
+
+{tags}`,
+    ],
+
+    weibo: [
+      `整理了{topic}的干货，分享给有需要的人。
+
+适合：{audience}
+预算参考：{budget}
+
+要点：
+{tips}
+
+注意：{notes}
+
+欢迎补充，也可以转发给用得上的朋友。
+
+{tags_weibo}`,
+    ],
+
+    default: [
+      `{topic} · 攻略整理
+
+适合人群：{audience}
+预算：{budget}
+
+核心干货：
+{tips}
+
+注意事项：
+{notes}
+
+{tags}`,
+    ],
+  },
+
+  // ─────────────────── MOOD ───────────────────
   mood: {
     xhs: [
-      `{topic} | 今天想聊聊{mood}这件事
+      `{topic} {e}
 
 {event}
 
 {feeling}
 
-也许这就是{insight}
+{insight}
+
+{tags}`,
+
+      `{mood}的一天，写下来 {e}
+
+{event}
+
+{feeling}
+
+这件事让我想到，{insight}。不知道有没有人有过同样的感觉。
+
+{tags}`,
+
+      `今天的状态：{mood} {e}
+
+{event}
+
+没什么大事，就是想记录一下。
+
+{feeling}
 
 {tags}`,
     ],
+
     wechat: [
       `{topic}
 
 {event}
 
 {feeling}`,
-    ],
-    default: [
-      `{topic}
 
-心情：{mood}
+      `{mood}。{event}
+
+{feeling}`,
+
+      `{topic}。{event}。{feeling}。`,
+    ],
+
+    douyin: [
+      `{mood}的时候，就会想起{topic} {e}
 
 {event}
 
 {feeling}
 
+{insight}
+
+{tags}`,
+    ],
+
+    weibo: [
+      `{topic}
+
+{event}
+
+{feeling}
+
+{insight}
+
+{tags_weibo}`,
+    ],
+
+    instagram: [
+      `{e} {topic}
+
+{feeling}
+
+{tags_en}`,
+    ],
+
+    twitter: [
+      `{topic}。{feeling}。{tags_short}`,
+      `{mood}，{event}，{feeling}。`,
+    ],
+
+    default: [
+      `{topic}
+
+心情：{mood}
+{event}
+
+{feeling}
+
+{insight}
+
 {tags}`,
     ],
   },
-  study: [
-    `{subject} | 打卡{days} 📚
 
-今日进度：{progress}
+  // ─────────────────── STUDY ───────────────────
+  study: {
+    xhs: [
+      `{subject} · 打卡{days} {e}
 
-今日收获：
+今天完成了：{progress}
+
+收获：
 {gain}
 
 {encourage}
 
-坚持就是答案，一起加油💪
+{tags}`,
+
+      `{days} — 关于{subject}的一些记录 {e}
+
+今天的进度：{progress}
+
+{gain}
+
+说实话，{encourage}
 
 {tags}`,
-  ],
-  fitness: [
-    `💪 {type}打卡 {days}
 
-⏱ 时长：{duration}
-🔥 消耗：{calories}
+      `{subject}学习记录｜{days} {e}
 
-{feeling}
+进度：{progress}
 
-📊 成果：{change}
+今天最有收获的一点：
+{gain}
+
+给自己说：{encourage}
+
+{tags}`,
+    ],
+
+    douyin: [
+      `{subject}打卡{days} {e}
+
+今天：{progress}
+
+收获：{gain}
+
+{encourage}
+
+一起加油吧
+
+{tags}`,
+    ],
+
+    weibo: [
+      `{subject} 打卡{days}
+
+今日：{progress}
+收获：{gain}
+
+{encourage}
+
+有在学{subject}的可以一起交流 ✉️
+
+{tags_weibo}`,
+    ],
+
+    wechat: [
+      `{subject}打卡{days}，今天{progress}，{gain}。{encourage}`,
+    ],
+
+    default: [
+      `{subject} · {days} 打卡
+
+进度：{progress}
+收获：{gain}
 
 {encourage}
 
 {tags}`,
-  ],
-  photo: [
-    `📷 {location}摄影记录
+    ],
+  },
+
+  // ─────────────────── FITNESS ───────────────────
+  fitness: {
+    xhs: [
+      `{type} · 打卡{days} {e}
+
+⏱ {duration} | 🔥 {calories}
+
+{feeling}
+
+变化：{change}
+
+{encourage}
+
+{tags}`,
+
+      `{days} — {type}记录 {e}
+
+时长：{duration}
+消耗：{calories}
+
+今天的感受：
+{feeling}
+
+阶段成果：{change}
+
+{encourage}
+
+{tags}`,
+
+      `{type}打卡，这次认真记录一下 {e}
+
+{duration}，{calories}，{feeling}
+
+到现在{days}，{change}
+
+比起结果，更想说的是{encourage}
+
+{tags}`,
+    ],
+
+    douyin: [
+      `{type} {days} {e}
+
+{duration} | {calories}
+
+{feeling}
+
+{change}
+
+{encourage}
+
+{tags}`,
+    ],
+
+    weibo: [
+      `{type}打卡{days}。
+
+{duration}，消耗{calories}。
+
+{feeling}，{change}。
+
+{encourage}
+
+{tags_weibo}`,
+    ],
+
+    wechat: [
+      `{type}打卡{days}，今天{duration}，{feeling}，{change}。{encourage}`,
+    ],
+
+    default: [
+      `{type} 打卡 {days}
+
+时长：{duration} · 消耗：{calories}
+
+感受：{feeling}
+变化：{change}
+
+{encourage}
+
+{tags}`,
+    ],
+  },
+
+  // ─────────────────── PHOTO ───────────────────
+  photo: {
+    xhs: [
+      `{location}·拍摄记录 {e}
+
+器材：{device}
+后期：{editing}
+
+{story}
+
+技巧备忘：{technique}
+
+{tags}`,
+
+      `分享一组在{location}拍的照片 {e}
+
+用的是{device}，{technique}，后期{editing}
+
+{story}
+
+不完美但很真实，这种感觉挺好的。
+
+{tags}`,
+
+      `{location} · 光线和构图的记录 {e}
+
+{story}
+
+器材：{device}
+技巧：{technique}
+后期：{editing}
+
+摄影对我来说更多是记录，不那么在意"对不对"。
+
+{tags}`,
+    ],
+
+    douyin: [
+      `{location}随拍，{device}直出 {e}
+
+{story}
+
+技巧：{technique}
+后期：{editing}
+
+原来好看不一定需要复杂器材
+
+{tags}`,
+    ],
+
+    instagram: [
+      `{e} {location}
+
+{story}
+
+Shot on {device} · {editing}
+
+{tags_en}`,
+
+      `{location} through the lens 📷
+
+{story}
+
+{device} · {technique}
+
+{tags_en}`,
+    ],
+
+    default: [
+      `{location} 摄影记录 {e}
 
 设备：{device}
 技巧：{technique}
@@ -1970,59 +2734,338 @@ Loving every moment here 🌿
 
 {story}
 
-摄影是用光记录瞬间，每一张照片都是独一无二的故事。
-
 {tags}`,
-  ],
-  home: [
-    `🏠 家居改造｜{item}
+    ],
+  },
 
-风格：{style}
+  // ─────────────────── HOME ───────────────────
+  home: {
+    xhs: [
+      `家居改造｜{item} {e}
+
+风格方向：{style}
 来源：{brand}
 
 改造前后：{effect}
 
 {feeling}
 
-属于自己的小天地，超治愈✨
+整体预算：不高，主要是{brand}
 
 {tags}`,
-  ],
-  review: [
-    `{title} | {summary} {rating_emoji}
+
+      `分享一下{item}的改造过程 {e}
+
+风格：{style}
+买了哪些：{brand}
+
+改变最大的地方：{effect}
+
+{feeling}
+
+如果你也在做类似改造，欢迎交流。
+
+{tags}`,
+
+      `记录一下{item}改动之后的状态 {e}
+
+说实话改之前：{effect}（反过来想）
+改完之后：{effect}
+
+选的是{style}风格，从{brand}淘的
+
+{feeling}
+
+{tags}`,
+    ],
+
+    douyin: [
+      `{item}改造前后对比 {e}
+
+风格：{style}
+来源：{brand}
+
+{effect}
+
+{feeling}
+
+自己动手改造真的上头
+
+{tags}`,
+    ],
+
+    wechat: [
+      `{item}弄完了，{style}风格，{effect}，{feeling}。`,
+    ],
+
+    default: [
+      `家居记录｜{item} {e}
+
+风格：{style}
+来源：{brand}
+改变：{effect}
+
+{feeling}
+
+{tags}`,
+    ],
+  },
+
+  // ─────────────────── REVIEW ───────────────────
+  review: {
+    xhs: [
+      `{title} | 看完想说几句 {e}
 
 类型：{type}
+评分：{rating_emoji}
+
+一句话：{summary}
+
+详细说说：
+{detail}
+
+值得看的理由：{recommend}
+
+{tags}`,
+
+      `{title} — 我的真实观感 {e}
+
+{rating_emoji} · {type}
 
 {detail}
 
-推荐理由：{recommend}
+最打动我的部分：{summary}
 
-强推给所有还没看的人！
+推荐给：{recommend}
 
 {tags}`,
-  ],
-  career: [
-    `关于{topic}，我想分享一些真实经历
+
+      `关于{title}，说几点个人看法 {e}
+
+总体评价：{rating_emoji}
+
+{detail}
+
+{summary}
+
+适合{recommend}的时候看。
+
+{tags}`,
+    ],
+
+    douyin: [
+      `{title}值不值得看？说说我的看法 {e}
+
+类型：{type}
+评分：{rating_emoji}
+
+{summary}
+
+{detail}
+
+推荐给：{recommend}
+
+{tags}`,
+    ],
+
+    weibo: [
+      `看完{title}，说说感受。
+
+{rating_emoji} · {type}
+
+{detail}
+
+{summary}
+
+推荐：{recommend}
+
+{tags_weibo}`,
+    ],
+
+    wechat: [
+      `刚看完{title}，{summary}。{detail}。推荐给{recommend}。{rating_emoji}`,
+    ],
+
+    default: [
+      `{title} 评价
+
+类型：{type}
+评分：{rating_emoji}
+
+{summary}
+
+{detail}
+
+推荐：{recommend}
+
+{tags}`,
+    ],
+  },
+
+  // ─────────────────── CAREER ───────────────────
+  career: {
+    xhs: [
+      `关于{topic}，记录一些真实想法 {e}
 
 {story}
 
-我的感悟：
+我从这件事里拿到的东西：
 {insight}
 
-职场是一场修行，慢慢来～
+{industry}的朋友如果有类似经历，欢迎聊聊。
 
 {tags}`,
-  ],
-  pet: [
-    `{petname}今天又整了个大活😂
+
+      `{topic}之后，有几点想分享 {e}
+
+背景：{industry}
+
+经历：
+{story}
+
+感悟：
+{insight}
+
+不一定适用所有人，但希望有参考价值。
+
+{tags}`,
+
+      `职场小记｜{topic} {e}
+
+{story}
+
+{insight}
+
+{industry}这个圈子，有时候学到东西的方式很出乎意料。
+
+{tags}`,
+    ],
+
+    linkedin: [
+      `{topic} — a reflection
+
+{story}
+
+What I took away:
+{insight}
+
+Happy to connect with others in {industry} who've had similar experiences.
+
+{tags_en}`,
+    ],
+
+    douyin: [
+      `{topic}，说说我的真实经历 {e}
+
+{story}
+
+收获：{insight}
+
+{industry}的朋友有共鸣吗？
+
+{tags}`,
+    ],
+
+    weibo: [
+      `分享一次关于{topic}的经历。
+
+{story}
+
+{insight}
+
+有同样经历的欢迎交流。
+
+{tags_weibo}`,
+    ],
+
+    default: [
+      `{topic} · 职场记录 {e}
+
+{story}
+
+感悟：{insight}
+
+{tags}`,
+    ],
+  },
+
+  // ─────────────────── PET ───────────────────
+  pet: {
+    xhs: [
+      `{petname}今天做了件很{pettype}的事 {e}
 
 {event}
 
-{pettype}真的是世界上最可爱的生物
-{feeling}，根本绷不住！
+{feeling}
+
+养{pettype}就是这样，每天都有新的惊喜。
 
 {tags}`,
-  ],
+
+      `记录一下{petname}的日常 {e}
+
+{event}
+
+{feeling}
+
+{pettype}的世界真的很简单，但看着它就觉得挺好的。
+
+{tags}`,
+
+      `{petname}又让我不知道说什么好了 {e}
+
+{event}
+
+{pettype}·{feeling}
+
+{tags}`,
+    ],
+
+    douyin: [
+      `{petname}今天的名场面 {e}
+
+{event}
+
+{feeling}
+
+{pettype}真的太可了
+
+{tags}`,
+    ],
+
+    weibo: [
+      `{petname}今天：{event}
+
+{feeling}
+
+{pettype}日常记录。{tags_weibo}`,
+    ],
+
+    wechat: [
+      `{petname}今天，{event}。{feeling}。`,
+      `记录一下{petname}，{event}。{feeling}。`,
+    ],
+
+    instagram: [
+      `{e} {petname} being {petname} again
+
+{event}
+
+{feeling}
+
+{tags_en}`,
+    ],
+
+    default: [
+      `{petname} 日常 {e}
+
+{event}
+
+{feeling}
+
+{tags}`,
+    ],
+  },
 };
 
 // ===================== TAG DATABASE =====================
